@@ -1,0 +1,25 @@
+[General]
+Author=
+
+[Directories]
+DirCount=0
+
+[C:\Program Files\Borland\CBuilder6\Bin\dclclxstd60.bpl]
+PackageDir=-1
+RequiredExeDir=-1
+RequiredLibDir=-1
+Group1=
+Group1Dir=-1
+Group1Optional=0
+Group1UpdateLib=0
+
+[C:\Program Files\Borland\CBuilder6\Bin\applet60.bpl]
+PackageDir=-1
+RequiredExeDir=-1
+RequiredLibDir=-1
+
+[C:\Program Files\Borland\CBuilder6\Bin\dclstd60.bpl]
+PackageDir=-1
+RequiredExeDir=-1
+RequiredLibDir=-1
+

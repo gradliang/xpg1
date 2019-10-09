@@ -1,0 +1,210 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!-- C++Builder XML Project -->
+<PROJECT>
+  <MACROS>
+    <VERSION value="BCB.06.00"/>
+    <PROJECT value="MagicBuilderAK.exe"/>
+    <OBJFILES value="MagicBuilderAK.obj fmMain.obj fmPage.obj fmStage.obj fmSprite.obj 
+      fmRole.obj fmCommand.obj dgQuality.obj dgMovieSize.obj xpg.obj 
+      xpgMovie.obj xpgRole.obj xpgPage.obj xpgSprite.obj xpgWriter.obj 
+      xpgReader.obj xpgHash.obj dgInsert.obj dgMove.obj dgTransColor.obj 
+      dgResize.obj dgThumbArray.obj dgAbout.obj xpgDIB.obj fmMovSet.obj"/>
+    <RESFILES value="MagicBuilder.res"/>
+    <IDLFILES value=""/>
+    <IDLGENFILES value=""/>
+    <DEFFILE value=""/>
+    <RESDEPEN value="$(RESFILES) fmMain.dfm fmPage.dfm fmStage.dfm fmSprite.dfm fmRole.dfm 
+      fmCommand.dfm dgQuality.dfm dgMovieSize.dfm dgInsert.dfm dgMove.dfm 
+      dgTransColor.dfm dgResize.dfm dgThumbArray.dfm dgAbout.dfm fmMovSet.dfm"/>
+    <LIBFILES value="BMGLib\BMGLib_DLL\BMGLib.lib"/>
+    <LIBRARIES value="vclx.lib vcldb.lib dsnap.lib dbrtl.lib rtl.lib vcl.lib"/>
+    <SPARELIBS value="vcl.lib rtl.lib dbrtl.lib dsnap.lib vcldb.lib vclx.lib"/>
+    <PACKAGES value="vcl.bpi rtl.bpi vclx.bpi visualclx.bpi dclstd.bpi"/>
+    <PATHCPP value=".;"/>
+    <PATHPAS value=".;"/>
+    <PATHRC value=".;"/>
+    <PATHASM value=".;"/>
+    <DEBUGLIBPATH value="$(BCB)\lib\debug"/>
+    <RELEASELIBPATH value="$(BCB)\lib\release"/>
+    <LINKER value="ilink32"/>
+    <USERDEFINES value="_DEBUG,_BMG_LIBJPEG_STANDALONE,EDITOR"/>
+    <SYSDEFINES value="NO_STRICT"/>
+    <MAINSOURCE value="MagicBuilderAK.cpp"/>
+    <INCLUDEPATH value="&quot;BMGLib\BMGLib_DLL\BCB Demo&quot;;&quot;D:\Work\MagicBuilder\BMGLib\BMGLib_DLL\BCB Demo&quot;;D:\Work\MagicBuilder;&quot;C:\Program Files\Borland\CBuilder6\Projects&quot;;..;$(BCB)\include;$(BCB)\include\vcl;D:\Work\MagicBuilder\BMGLib\JPEG;D:\Work\MagicBuilder\BMGLib\lpng125;D:\Work\MagicBuilder\BMGLib\BMGLib_DLL"/>
+    <LIBPATH value="&quot;BMGLib\BMGLib_DLL\BCB Demo&quot;;&quot;D:\Work\MagicBuilder\BMGLib\BMGLib_DLL\BCB Demo&quot;;D:\Work\MagicBuilder;D:\Work\MagicBuilder\BMGLib\BMGLib_DLL;&quot;C:\Program Files\Borland\CBuilder6\Projects&quot;;..;$(BCB)\lib\obj;$(BCB)\lib"/>
+    <WARNINGS value="-w-par"/>
+    <OTHERFILES value=""/>
+  </MACROS>
+  <OPTIONS>
+    <IDLCFLAGS value="-I&quot;BMGLib\BMGLib_DLL\BCB Demo&quot; 
+      -I&quot;D:\Work\MagicBuilder\BMGLib\BMGLib_DLL\BCB Demo&quot; -ID:\Work\MagicBuilder 
+      -I&quot;C:\Program Files\Borland\CBuilder6\Projects&quot; -I.. -I$(BCB)\include 
+      -I$(BCB)\include\vcl -ID:\Work\MagicBuilder\BMGLib\JPEG 
+      -ID:\Work\MagicBuilder\BMGLib\lpng125 
+      -ID:\Work\MagicBuilder\BMGLib\BMGLib_DLL -src_suffix cpp 
+      -D_DEBUG,_BMG_LIBJPEG_STANDALONE,EDITOR -boa"/>
+    <CFLAG1 value="-Od -H=$(BCB)\lib\vcl60.csm -Hc -Vx -Ve -X- -r- -a8 -b- -k -y -v -vi- -c 
+      -tW -tWM"/>
+    <PFLAGS value="-$YD -$W -$O- -$A8 -v -JPHNE -M"/>
+    <RFLAGS value=""/>
+    <AFLAGS value="/mx /w2 /zd"/>
+    <LFLAGS value="-D&quot;&quot; -aa -Tpe -x -Gn -v"/>
+    <OTHERFILES value=""/>
+  </OPTIONS>
+  <LINKER>
+    <ALLOBJ value="c0w32.obj sysinit.obj $(OBJFILES)"/>
+    <ALLRES value="$(RESFILES)"/>
+    <ALLLIB value="$(LIBFILES) $(LIBRARIES) import32.lib cp32mt.lib"/>
+    <OTHERFILES value=""/>
+  </LINKER>
+  <FILELIST>
+      <FILE FILENAME="MagicBuilder.res" FORMNAME="" UNITNAME="MagicBuilder.res" CONTAINERID="ResTool" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="MagicBuilderAK.cpp" FORMNAME="" UNITNAME="MagicBuilderAK" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="fmMain.cpp" FORMNAME="wMain" UNITNAME="fmMain" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="fmPage.cpp" FORMNAME="wPage" UNITNAME="fmPage" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="fmStage.cpp" FORMNAME="wStage" UNITNAME="fmStage" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="fmSprite.cpp" FORMNAME="wSprite" UNITNAME="fmSprite" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="fmRole.cpp" FORMNAME="wRole" UNITNAME="fmRole" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="fmCommand.cpp" FORMNAME="wCommand" UNITNAME="fmCommand" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="dgQuality.cpp" FORMNAME="DlgQuality" UNITNAME="dgQuality" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="dgMovieSize.cpp" FORMNAME="dlgMovieSize" UNITNAME="dgMovieSize" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="BMGLib\BMGLib_DLL\BMGLib.lib" FORMNAME="" UNITNAME="BMGLib.lib" CONTAINERID="LibTool" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="xpg.cpp" FORMNAME="" UNITNAME="xpg" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="xpgMovie.cpp" FORMNAME="" UNITNAME="xpgMovie" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="xpgRole.cpp" FORMNAME="" UNITNAME="xpgRole" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="xpgPage.cpp" FORMNAME="" UNITNAME="xpgPage" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="xpgSprite.cpp" FORMNAME="" UNITNAME="xpgSprite" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="xpgWriter.cpp" FORMNAME="" UNITNAME="xpgWriter" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="xpgReader.cpp" FORMNAME="" UNITNAME="xpgReader" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="xpgHash.cpp" FORMNAME="" UNITNAME="xpgHash" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="dgInsert.cpp" FORMNAME="OKBottomDlg" UNITNAME="dgInsert" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="dgMove.cpp" FORMNAME="OKBottomDlg1" UNITNAME="dgMove" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="dgTransColor.cpp" FORMNAME="DlgTransColor" UNITNAME="dgTransColor" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="dgResize.cpp" FORMNAME="DlgResize" UNITNAME="dgResize" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="dgThumbArray.cpp" FORMNAME="OKBottomDlg2" UNITNAME="dgThumbArray" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="dgAbout.cpp" FORMNAME="dlgAbout" UNITNAME="dgAbout" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="xpgDIB.cpp" FORMNAME="" UNITNAME="xpgDIB" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="fmMovSet.cpp" FORMNAME="wMovSet" UNITNAME="fmMovSet" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+  </FILELIST>
+  <BUILDTOOLS>
+  </BUILDTOOLS>
+
+  <IDEOPTIONS>
+[Version Info]
+IncludeVerInfo=0
+AutoIncBuild=0
+MajorVer=1
+MinorVer=0
+Release=0
+Build=0
+Debug=0
+PreRelease=0
+Special=0
+Private=0
+DLL=0
+Locale=1028
+CodePage=950
+
+[Version Info Keys]
+CompanyName=
+FileDescription=
+FileVersion=1.0.0.0
+InternalName=
+LegalCopyright=
+LegalTrademarks=
+OriginalFilename=
+ProductName=
+ProductVersion=4.1.12.0
+Comments=
+
+[HistoryLists\hlIncludePath]
+Count=18
+Item0=BMGLib\BMGLib_DLL\BCB Demo;D:\Work\MagicBuilder\BMGLib\BMGLib_DLL\BCB Demo;D:\Work\MagicBuilder;C:\Program Files\Borland\CBuilder6\Projects;..;$(BCB)\include;$(BCB)\include\vcl;D:\Work\MagicBuilder\BMGLib\JPEG;D:\Work\MagicBuilder\BMGLib\lpng125;D:\Work\MagicBuilder\BMGLib\BMGLib_DLL
+Item1=D:\Work\MagicBuilder;C:\Program Files\Borland\CBuilder6\Projects;..;$(BCB)\include;$(BCB)\include\vcl;D:\Work\MagicBuilder\BMGLib\JPEG;D:\Work\MagicBuilder\BMGLib\lpng125;D:\Work\MagicBuilder\BMGLib\BMGLib_DLL
+Item2=D:\Work\MagicBuilder\BMGLib\BMGLib_DLL\BCB Demo;D:\Work\MagicBuilder\BMGLib\BMGLib_DLL\BCB Demo;D:\Work\MagicBuilder;C:\Program Files\Borland\CBuilder6\Projects;..;$(BCB)\include;$(BCB)\include\vcl;D:\Work\MagicBuilder\BMGLib\JPEG;D:\Work\MagicBuilder\BMGLib\lpng125;D:\Work\MagicBuilder\BMGLib\BMGLib_DLL
+Item3=D:\Work\MagicBuilder\BMGLib\BMGLib_DLL\BCB Demo;D:\Work\MagicBuilder;C:\Program Files\Borland\CBuilder6\Projects;..;$(BCB)\include;$(BCB)\include\vcl;D:\Work\MagicBuilder\BMGLib\JPEG;D:\Work\MagicBuilder\BMGLib\lpng125;D:\Work\MagicBuilder\BMGLib\BMGLib_DLL
+Item4=..\MagicBuilder-backup 8.03;D:\Work\MagicBuilder\BMGLib\BMGLib_DLL\BCB Demo;D:\Work\MagicBuilder;C:\Program Files\Borland\CBuilder6\Projects;..;D:\Works\mBuilder;$(BCB)\include;$(BCB)\include\vcl;D:\Work\MagicBuilder\BMGLib\JPEG;D:\Work\MagicBuilder\BMGLib\lpng125;D:\Work\MagicBuilder\BMGLib\BMGLib_DLL
+Item5=D:\Work\MagicBuilder\BMGLib\BMGLib_DLL\BCB Demo;D:\Work\MagicBuilder;C:\Program Files\Borland\CBuilder6\Projects;..;D:\Works\mBuilder;$(BCB)\include;$(BCB)\include\vcl;D:\Work\MagicBuilder\BMGLib\JPEG;D:\Work\MagicBuilder\BMGLib\lpng125;D:\Work\MagicBuilder\BMGLib\BMGLib_DLL
+Item6=D:\Work\MagicBuilder\BMGLib\BMGLib_DLL\BCB Demo;D:\Works\MagicBuilder;C:\Program Files\Borland\CBuilder6\Projects;..;D:\Works\mBuilder;$(BCB)\include;$(BCB)\include\vcl;D:\Work\MagicBuilder\BMGLib\JPEG;D:\Work\MagicBuilder\BMGLib\lpng125;D:\Work\MagicBuilder\BMGLib\BMGLib_DLL
+Item7=D:\Works\MagicBuilder;C:\Program Files\Borland\CBuilder6\Projects;..;D:\Works\mBuilder;$(BCB)\include;$(BCB)\include\vcl;D:\Work\MagicBuilder\BMGLib\JPEG;D:\Work\MagicBuilder\BMGLib\lpng125;D:\Work\MagicBuilder\BMGLib\BMGLib_DLL
+Item8=D:\Works\MagicBuilder;C:\Program Files\Borland\CBuilder6\Projects;..;D:\Works\mBuilder;$(BCB)\include;$(BCB)\include\vcl;D:\Work\MagicBuilder\BMGLib\JPEG;D:\Work\MagicBuilder\BMGLib\lpng125;D:\Work\MagicBuilder\BMGLib
+Item9=D:\Works\MagicBuilder;D:\Work\MagicBuilder\BMGLib\BMGLib_DLL\BCB Demo;C:\Program Files\Borland\CBuilder6\Projects;..;D:\Works\mBuilder;$(BCB)\include;$(BCB)\include\vcl;D:\Work\MagicBuilder\BMGLib\JPEG;D:\Work\MagicBuilder\BMGLib\lpng125
+Item10=D:\Work\MagicBuilder\BMGLib\BMGLib_DLL\BCB Demo;C:\Program Files\Borland\CBuilder6\Projects;..;D:\Works\mBuilder;$(BCB)\include;$(BCB)\include\vcl;D:\Work\MagicBuilder\BMGLib\BMGLib_DLL;D:\Work\MagicBuilder\BMGLib\JPEG;D:\Work\MagicBuilder\BMGLib\lpng125
+Item11=C:\Program Files\Borland\CBuilder6\Projects;..;D:\Works\mBuilder;$(BCB)\include;$(BCB)\include\vcl;D:\Work\MagicBuilder\BMGLib\BMGLib_DLL;D:\Work\MagicBuilder\BMGLib\JPEG;D:\Work\MagicBuilder\BMGLib\lpng125
+Item12=..;D:\Works\mBuilder;$(BCB)\include;$(BCB)\include\vcl;D:\Work\MagicBuilder\BMGLib\BMGLib_DLL;D:\Work\MagicBuilder\BMGLib\JPEG;D:\Work\MagicBuilder\BMGLib\lpng125
+Item13=..;..\testLibJpeg;$(BCB)\include;$(BCB)\include\vcl;D:\Work\MagicBuilder\BMGLib\BMGLib_DLL;D:\Work\MagicBuilder\BMGLib\JPEG
+Item14=..;..\testLibJpeg;$(BCB)\include;$(BCB)\include\vcl
+Item15=..;..\Bcb6Demo;$(BCB)\include;$(BCB)\include\vcl
+Item16=..;..\Bcb6Demo;$(BCB)\include;$(BCB)\include\vcl;..\
+Item17=..\BCB Demo;..\Bcb6Demo;$(BCB)\include;$(BCB)\include\vcl
+
+[HistoryLists\hlLibraryPath]
+Count=15
+Item0=BMGLib\BMGLib_DLL\BCB Demo;D:\Work\MagicBuilder\BMGLib\BMGLib_DLL\BCB Demo;D:\Work\MagicBuilder;D:\Work\MagicBuilder\BMGLib\BMGLib_DLL;C:\Program Files\Borland\CBuilder6\Projects;..;$(BCB)\lib\obj;$(BCB)\lib
+Item1=D:\Work\MagicBuilder;D:\Work\MagicBuilder\BMGLib\BMGLib_DLL;C:\Program Files\Borland\CBuilder6\Projects;..;$(BCB)\lib\obj;$(BCB)\lib
+Item2=D:\Work\MagicBuilder\BMGLib\BMGLib_DLL\BCB Demo;D:\Work\MagicBuilder\BMGLib\BMGLib_DLL\BCB Demo;D:\Work\MagicBuilder;D:\Work\MagicBuilder\BMGLib\BMGLib_DLL;C:\Program Files\Borland\CBuilder6\Projects;..;$(BCB)\lib\obj;$(BCB)\lib
+Item3=D:\Work\MagicBuilder\BMGLib\BMGLib_DLL\BCB Demo;D:\Work\MagicBuilder;D:\Work\MagicBuilder\BMGLib\BMGLib_DLL;C:\Program Files\Borland\CBuilder6\Projects;..;$(BCB)\lib\obj;$(BCB)\lib
+Item4=..\MagicBuilder-backup 8.03;D:\Work\MagicBuilder\BMGLib\BMGLib_DLL\BCB Demo;D:\Work\MagicBuilder;D:\Work\MagicBuilder\BMGLib\BMGLib_DLL;C:\Program Files\Borland\CBuilder6\Projects;..;D:\Works\mBuilder;$(BCB)\lib\obj;$(BCB)\lib
+Item5=D:\Work\MagicBuilder\BMGLib\BMGLib_DLL\BCB Demo;D:\Work\MagicBuilder;D:\Work\MagicBuilder\BMGLib\BMGLib_DLL;C:\Program Files\Borland\CBuilder6\Projects;..;D:\Works\mBuilder;$(BCB)\lib\obj;$(BCB)\lib
+Item6=D:\Work\MagicBuilder\BMGLib\BMGLib_DLL\BCB Demo;D:\Works\MagicBuilder;D:\Work\MagicBuilder\BMGLib\BMGLib_DLL;C:\Program Files\Borland\CBuilder6\Projects;..;D:\Works\mBuilder;$(BCB)\lib\obj;$(BCB)\lib
+Item7=D:\Works\MagicBuilder;D:\Work\MagicBuilder\BMGLib\BMGLib_DLL;C:\Program Files\Borland\CBuilder6\Projects;..;D:\Works\mBuilder;$(BCB)\lib\obj;$(BCB)\lib
+Item8=D:\Works\MagicBuilder;D:\Work\MagicBuilder\BMGLib\BMGLib_DLL\BCB Demo;C:\Program Files\Borland\CBuilder6\Projects;..;D:\Works\mBuilder;$(BCB)\lib\obj;$(BCB)\lib
+Item9=D:\Work\MagicBuilder\BMGLib\BMGLib_DLL\BCB Demo;C:\Program Files\Borland\CBuilder6\Projects;..;D:\Works\mBuilder;$(BCB)\lib\obj;$(BCB)\lib
+Item10=C:\Program Files\Borland\CBuilder6\Projects;..;D:\Works\mBuilder;$(BCB)\lib\obj;$(BCB)\lib
+Item11=..;D:\Works\mBuilder;$(BCB)\lib\obj;$(BCB)\lib
+Item12=..;..\testLibJpeg;$(BCB)\lib\obj;$(BCB)\lib
+Item13=..;..\Bcb6Demo;$(BCB)\lib\obj;$(BCB)\lib
+Item14=..\BCB Demo;..\Bcb6Demo;$(BCB)\lib\obj;$(BCB)\lib
+
+[HistoryLists\hlDebugSourcePath]
+Count=1
+Item0=$(BCB)\source\vcl
+
+[HistoryLists\hlConditionals]
+Count=3
+Item0=_DEBUG,_BMG_LIBJPEG_STANDALONE,EDITOR
+Item1=_DEBUG,_BMG_LIBJPEG_STANDALONE
+Item2=_DEBUG
+
+[HistoryLists\hlFinalOutputDir]
+Count=8
+Item0=D:\Work\MagicBuilder4112 20100514\bin\
+Item1=D:\Work\MagicBuilder40 20091123\bin\
+Item2=D:\Work\MagicBuilder40 20091119\bin\
+Item3=D:\Work\MagicBuilder4 20091119\bin\
+Item4=D:\Work\MagicBuilder\bin\
+Item5=D:\Work\MagicBuilder\bin
+Item6=D:\Works\MagicBuilder\bin\
+Item7=D:\Works\MagicBuilder\bin
+
+[Debugging]
+DebugSourceDirs=$(BCB)\source\vcl
+
+[Parameters]
+RunParams=
+Launcher=
+UseLauncher=0
+DebugCWD=
+HostApplication=
+RemoteHost=
+RemotePath=
+RemoteLauncher=
+RemoteCWD=
+RemoteDebug=0
+
+[Compiler]
+ShowInfoMsgs=0
+LinkDebugVcl=0
+LinkCGLIB=0
+
+[CORBA]
+AddServerUnit=1
+AddClientUnit=1
+PrecompiledHeaders=1
+
+[Language]
+ActiveLang=
+ProjectLang=
+RootDir=
+  </IDEOPTIONS>
+</PROJECT>
