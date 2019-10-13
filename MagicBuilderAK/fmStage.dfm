@@ -26,10 +26,10 @@ object wStage: TwStage
   PixelsPerInch = 96
   TextHeight = 13
   object Splitter1: TSplitter
-    Left = 587
+    Left = 579
     Top = 0
     Width = 5
-    Height = 395
+    Height = 400
     Cursor = crHSplit
     Align = alRight
   end
@@ -43,8 +43,8 @@ object wStage: TwStage
   object WorkArea: TScrollBox
     Left = 0
     Top = 0
-    Width = 587
-    Height = 395
+    Width = 579
+    Height = 400
     HorzScrollBar.Color = clHighlight
     HorzScrollBar.ParentColor = False
     Align = alClient
@@ -92,8 +92,8 @@ object wStage: TwStage
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 395
-    Width = 750
+    Top = 400
+    Width = 742
     Height = 24
     Panels = <
       item
@@ -117,10 +117,10 @@ object wStage: TwStage
     SimplePanel = False
   end
   object ToolPanel: TPanel
-    Left = 592
+    Left = 584
     Top = 0
     Width = 158
-    Height = 395
+    Height = 400
     Align = alRight
     BevelOuter = bvLowered
     Caption = 'PanelTool'
@@ -145,7 +145,7 @@ object wStage: TwStage
       Left = 4
       Top = 123
       Width = 149
-      Height = 198
+      Height = 246
       DropDownRows = 10
       Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goEditing, goTabs, goAlwaysShowEditor]
       Strings.Strings = (
@@ -157,7 +157,10 @@ object wStage: TwStage
         'Top='
         'Width='
         'Height='
-        'Flag=')
+        'Flag='
+        'TouchEn='
+        'TouchFlag='
+        '')
       TabOrder = 0
       TitleCaptions.Strings = (
         'Property'
@@ -169,7 +172,7 @@ object wStage: TwStage
       OnSetEditText = ValueListEditor1SetEditText
       ColWidths = (
         53
-        90)
+        73)
     end
     object cbSprite: TComboBox
       Left = 4
