@@ -13,6 +13,8 @@
 #include <process.h>
 #pragma hdrstop
 
+#include <stdlib.h>
+#include <time.h>
 #include "fmMain.h"
 #include "fmRole.h"
 #include "fmPage.h"
@@ -49,6 +51,7 @@ __fastcall TwMain::TwMain(TComponent* Owner)
     boNewFile = true;
     boModified = false;
     boExit = false;
+    srand(time(NULL));
 }
 //---------------------------------------------------------------------------
 void __fastcall TwMain::FormCreate(TObject *Sender)

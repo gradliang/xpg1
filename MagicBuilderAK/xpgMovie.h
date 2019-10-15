@@ -260,6 +260,7 @@ public:
     XpgMovies();
     ~XpgMovies();
     bool m_SaveFile( const char *filename, int quality );
+    bool m_WriteNewFormatXPGFile( const char *filename);             // grad add
     bool m_LoadFile( const char *filename );
     void m_Clear();
 	void m_DeleteAllPages();

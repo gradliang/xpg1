@@ -2,6 +2,9 @@
 
 #include <vcl.h>
 #pragma hdrstop
+#include <vector>
+#include <string>
+#include <stdlib.h>
 
 #include "xpgHash.h"
 #include "BMGUtils.h"
@@ -295,6 +298,9 @@ long GetRoleData(FILE *fp, RoleImages *pCurRole)
 //----------------------------------------------------------------------------
 bool XpgMovies::m_SaveFile( const char *filename, int quality )
 {
+    if (m_boXPW == false)
+        return m_WriteNewFormatXPGFile(filename);
+    //////////////////////////////////////////////////////    
     FILE *fp = NULL;		/* target file */
     bool boNoErr = true;
 
@@ -778,6 +784,300 @@ len = 16
     }
     return true;
 }
+///////////////////////////////////////////////////////////////////////////////
+struct TXpgFileHead_1 {
+    unsigned char name[100];    // name  name of file
+    unsigned char mode[8];      // mode  file mode
+    unsigned char uid[8];       // uid  owner user ID
+    unsigned char gid[8];       // gid  owner group ID
+    unsigned char size[12];     // size  length of file in bytes
+    unsigned char mtime[12];    // mtime  modify time of file
+    unsigned char chksum[8];    // chksum  checksum for header
+    unsigned char typeflag[1];  // typeflag  type of file
+    unsigned char linkname[100];// linkname  name of linked file
+    unsigned char magic[6];     // magic  USTAR indicator
+    unsigned char version[2];   // version  USTAR version
+    unsigned char uname[32];    // uname  owner user name
+    unsigned char gname[32];    // gname  owner group name
+    unsigned char devmajor[8];  // devmajor  device major number
+    unsigned char devminor[8];  // devminor  device minor number
+    unsigned char prefix[155];  // prefix  prefix for file name
+};
+union TXpgFileHead{
+    unsigned char   rawdata[512];
+    TXpgFileHead_1  head;
+};
+///////////////////////////////////////////////////////////////////////////////
+bool XpgMovies::m_WriteNewFormatXPGFile(const char *filename)
+{
+    char tmpbuf[256];
+    FILE * xpg = NULL;
+    FILE * tar = NULL;
+    bool boNoErr = true;
+    static TXpgFileHead  fhead;
+    std::string tempdir;
+    std::string tempfile;
+    const char * p;
+    unsigned int uRoleTabOffset, uRoleNum;
+    unsigned int uPageTabOffset, uPageNum;
+
+    tempdir = getenv("TEMP");
+    p = tempdir.c_str();
+    if (p[strlen(p) - 1] != '\\')
+        tempdir += "\\";
+
+    sprintf(tmpbuf, "zzzzzzz_%05d%05d.xpg",1,1 /*rand(), rand()*/);
+    tempfile = tempdir + tmpbuf;
+    
+    xpg = fopen(tempfile.c_str(), "wb");
+    if (xpg == NULL)
+        return false;
+
+    memset(&fhead, 0, 512);
+    fwrite(&fhead, 1, 512, xpg);
+
+    // 写入ROLE表
+    uRoleTabOffset = ftell(xpg);
+    uRoleNum = m_iRoleCount;
+    for (int iRole = 0; iRole < m_iRoleCount; iRole++)
+    {
+        RoleImages * curRole = (RoleImages *)m_RoleList->Items[iRole];
+        fwrite(&(curRole->m_iWidth), 4, 1, xpg);
+        fwrite(&(curRole->m_iHeight), 4, 1, xpg);
+        if (curRole->m_iImgSourceSize <= 0)
+        {
+            fwrite(&(curRole->m_iImgSourceSize), 4, 1, xpg);
+        }
+        else
+        {
+            fwrite(&(curRole->m_iImgSourceSize), 4, 1, xpg);
+        }
+        switch (curRole->m_iType) {
+          case 0 : // 24bits JPEG
+              curRole->m_cBpp = 24;
+              break;
+          case 1 : // 1 bit OSD
+              curRole->m_cBpp = 1;
+              break;
+          case 2 : // 4 bits OSD
+              curRole->m_cBpp = 4;
+              break;
+          case 3 : // 8 bits OSD
+              curRole->m_cBpp = 7;
+              break;
+          case 4 : // 1bit BITMAP
+              curRole->m_cBpp = 1;
+              break;
+          case 5 : // 24bits JPEG Transperant
+              curRole->m_cBpp = 24;
+              break;
+          case 6 : // 8 bits OSD Transperant
+              curRole->m_cBpp = 7;
+              break;
+          case 7 : // fileName only
+              curRole->m_cBpp = 0;
+              break;
+          case 8 : // Image source
+              curRole->m_cBpp = 0;
+              break;
+        }
+        fputc(curRole->m_iFormat & 0xff, xpg); //JPG, PNG
+        fputc(curRole->m_cBpp & 0xff, xpg);
+        fputc(curRole->m_iType & 0xff, xpg);
+        fputc(0, xpg);
+        
+        //int n = curRole->m_Name.Length();
+        //curRole->m_lHashKey = xpgHash(curRole->m_Name.c_str(), n);
+        //fwrite(&(curRole->m_lHashKey), 4, 1, xpg);
+    }
+
+    // 写入PAGE表和脚本
+    uPageTabOffset = ftell(xpg);
+    uPageNum = m_iPageCount = m_PageList->Count;
+    for (int iPage = 0; iPage < m_iPageCount; iPage++)
+    {
+    }
+
+                                                          /*
+        fseek( fp, m_lPageHeaderPos + m_iPageCount * m_iPageHeaderLen, SEEK_SET );
+        for (int iPage = 0; iPage < m_iPageCount; iPage++)
+        {
+            // Write Sprite Data
+            Pages *pPage = (Pages *)m_PageList->Items[iPage];
+            pPage->m_iIndex = iPage;
+            pPage->m_lSpriteFilePos = ftell(fp);
+
+            pPage->m_iSpriteCount = pPage->m_SpriteList->Count;
+            for (int iSprite = 0; iSprite < pPage->m_iSpriteCount; iSprite++)
+            {
+                Sprites *pSprite = (Sprites *)(pPage->m_SpriteList->Items[iSprite]);
+                pSprite->m_iIndex = iSprite;
+                m_WriteSpriteData(fp, pSprite);
+            }
+
+            // Write Script Data
+            int iCommandCount = pPage->GetCommandCount();
+
+            pPage->m_lScriptFilePos = 0;
+            if (iCommandCount > 0)
+            {
+                pPage->m_lScriptFilePos = ftell(fp);
+
+                fwrite(&iCommandCount, 4, 1, fp);
+                for (int iScript = 0; iScript < XPG_COMMAND_COUNT; iScript++)
+                {
+                	if (pPage->m_Command[iScript].m_boEmpty)
+                       continue;                    
+
+                    AnsiString strButton = 	pPage->GetCommandButton(iScript); 
+					AnsiString strPage = 	pPage->GetCommandPage(iScript);
+					AnsiString strAction = 	pPage->GetCommandAction(iScript);
+				
+					WORD wButtonKey = m_GetButtonKey(strButton) - 1;
+					WORD wPageKey   = m_GetPageKey(strPage);
+					WORD wActionKey = m_GetActionKey(strAction) + 1;  
+					WORD wTemp = 0;
+					
+					fwrite(&(wButtonKey), 2, 1, fp);
+					fwrite(&(wTemp), 2, 1, fp);
+					
+					fwrite(&(wPageKey), 2, 1, fp);
+					fwrite(&(wTemp), 2, 1, fp);
+					
+					fwrite(&(wActionKey), 2, 1, fp);
+					fwrite(&(wTemp), 2, 1, fp);
+
+                    if (m_boXPW) {
+                        char buf[33];
+                        memset(buf, 0, 33);
+                        strcpy( buf, strPage.c_str() );
+                        fwrite((buf), 1, 16, fp);
+                        strcpy( buf, strAction.c_str() );
+                        fwrite((buf), 1, 32, fp);
+                    }   
+                }
+            }
+        }
+                                  */
+    
+    fclose(xpg);
+
+    return boNoErr;
+/*
+    FILE *fp = NULL;		 target file 
+    bool boNoErr = true;
+
+    if ((fp = fopen(filename, "wb")) == NULL)
+        return false;
+
+    m_InitHeader(false);
+
+    // reserve 512 bytes for file header
+    if (m_boXPW)
+        fseek( fp, 1024, SEEK_SET );
+    else
+        fseek( fp, 512, SEEK_SET );
+    if (boNoErr)
+    {
+        // Write Role Image Data
+        m_lImageHeaderPos = ftell(fp);
+        fseek( fp, m_lImageHeaderPos + m_iRoleCount * m_iImageHeaderLen, SEEK_SET );
+        for (int iRole = 0; iRole < m_iRoleCount; iRole++)
+        {
+
+            m_pCurRole = (RoleImages *)m_RoleList->Items[iRole];
+            m_pCurRole->m_iIndex = iRole;
+            m_pCurRole->m_lFilePos = ftell(fp);
+
+            // if SaveXPW then Set off in XPW4, if SaveXPG then save
+            if( m_boXPW ) ; // skip  when SaveXPW
+            else  m_pCurRole->m_lDataLen = 0(fp, m_pCurRole); // SaveXPG
+
+            if (m_boXPW)
+            {
+                // extra write source
+                if (m_pCurRole->m_iImgSourceSize <= 0)
+                { // Convert RoleData to ImgSource, adopted from
+                        long lRoleData=0;
+                        lRoleData = GetRoleData(fp, m_pCurRole);  // m_WriteRoleData(FILE *fp, RoleImages *pCurRole)
+                        m_pCurRole->m_iImgSourceSize = lRoleData;
+                        fwrite(&(m_pCurRole->m_iImgSourceSize), 4, 1, fp);
+
+                        AnsiString tempFileName = "tmp.jpg"; // read data from temp file
+                        FILE *fpTemp;
+                        if ((fpTemp = fopen(tempFileName.c_str(), "rb")) == NULL)
+                                return NULL;
+                        fseek( fpTemp, 0, SEEK_END );
+                        long lFileSize = ftell( fpTemp );
+                        long lDataLen = lFileSize;
+                        if (lDataLen % 4 != 0)
+                                lDataLen += 4 - (lDataLen % 4);
+                        fseek( fpTemp, 0, SEEK_SET );
+                        unsigned char *pszBuffer;
+                        pszBuffer = new unsigned char[lDataLen + 1];
+
+                        fread( pszBuffer, 1, lFileSize, fpTemp );
+                        fclose(fpTemp);
+                        fwrite(pszBuffer, 1, m_pCurRole->m_iImgSourceSize, fp);
+                        delete pszBuffer;
+
+                }
+                else
+                {
+                        fwrite(&(m_pCurRole->m_iImgSourceSize), 4, 1, fp);
+                        if (m_pCurRole->m_iImgSourceSize > 0)
+                                fwrite(m_pCurRole->m_pImgSource, 1, m_pCurRole->m_iImgSourceSize, fp);
+                }
+            }
+
+            if (m_pCurRole->m_lDataLen < 0) {
+                boNoErr = false;
+                break;
+            }
+        }
+
+        m_lPageHeaderPos = ftell(fp);
+        // Write Role Header
+        
+
+        // Write Page's Sprite & Script Data
+        
+
+        fputc(0, fp);
+        fputc(0, fp);
+        fputc(0, fp);
+        fputc(0, fp);
+
+        // Write Page Header
+        for (int iPage = 0; iPage < m_iPageCount; iPage++)
+        {
+            fseek( fp, m_lPageHeaderPos + iPage * m_iPageHeaderLen, SEEK_SET );
+            m_WritePageHeader(fp, (Pages *)(m_PageList->Items[iPage]));
+        }
+    }
+
+    if (boNoErr) {
+        fseek( fp, 0, SEEK_SET );
+        boNoErr = m_WriteHeader(fp);
+    }
+
+    if (boNoErr) {
+        fseek( fp, 0, SEEK_END );
+        long lFileSize = ftell(fp);
+        //char c = fgetc(fp);
+        if (lFileSize % 4 != 0) {
+            int n = 4 - (lFileSize % 4);
+            for (int i = 0; i < n; i++)
+                fputc(0, fp);
+
+        }
+    }
+
+    fclose(fp);
+    return boNoErr;
+    */
+}
+
 #if 1
 //**********************************************************************************
 // RGB2YUV
