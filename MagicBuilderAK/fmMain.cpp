@@ -304,7 +304,7 @@ void __fastcall TwMain::SaveXPG1Click(TObject *Sender)
             xpgMovie->m_boXPW = false;
             xpgMovie->m_SaveFile(fileName.c_str(), g_iJpegQuality);
 
-            ExportCcode(Sender, fileName);
+            //ExportCcode(Sender, fileName);
             Screen->Cursor = Save_Cursor;
         }
     }

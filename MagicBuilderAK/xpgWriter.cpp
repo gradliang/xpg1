@@ -6,6 +6,7 @@
 #include <string>
 #include <stdlib.h>
 #include <io.h>
+#include <time.h>
 #include "xpgHash.h"
 #include "BMGUtils.h"
 #include "BMGDLL.h"
@@ -253,7 +254,7 @@ bool XpgMovies::m_WriteHeader(FILE *fp)
     }
     return true;
 }
-long GetJPEGData( FILE *fp, Graphics::TBitmap *Bitmap, int quality )
+long GetJPEGData(Graphics::TBitmap *Bitmap, int quality )
 {
     AnsiString tempFileName = "tmp.jpg";
     if (FileExists(tempFileName)) DeleteFile(tempFileName);
@@ -288,11 +289,11 @@ long GetJPEGData( FILE *fp, Graphics::TBitmap *Bitmap, int quality )
     fclose(fpTemp);
     return lFileSize;
 }
-long GetRoleData(FILE *fp, RoleImages *pCurRole)
+long GetRoleData(RoleImages *pCurRole)
 { // adopted from m_WriteRoleData(FILE *fp, RoleImages *pCurRole)
     // lDataLen = m_WriteJPEG(fp, pCurRole->m_pBitmap, 100);
     long lDataLen = 0;
-    lDataLen = GetJPEGData(fp, pCurRole->m_pBitmap, 100);
+    lDataLen = GetJPEGData(pCurRole->m_pBitmap, 100);
     return lDataLen;
 }
 //----------------------------------------------------------------------------
@@ -337,7 +338,7 @@ bool XpgMovies::m_SaveFile( const char *filename, int quality )
                 if (m_pCurRole->m_iImgSourceSize <= 0)
                 { // Convert RoleData to ImgSource, adopted from
                         long lRoleData=0;
-                        lRoleData = GetRoleData(fp, m_pCurRole);  // m_WriteRoleData(FILE *fp, RoleImages *pCurRole)
+                        lRoleData = GetRoleData(m_pCurRole);  // m_WriteRoleData(FILE *fp, RoleImages *pCurRole)
                         m_pCurRole->m_iImgSourceSize = lRoleData;
                         fwrite(&(m_pCurRole->m_iImgSourceSize), 4, 1, fp);
 
@@ -812,35 +813,77 @@ struct TPageSpriteInfo {
 ///////////////////////////////////////////////////////////////////////////////
 int writeTarHead(FILE* fp, const char* filename, unsigned int size)
 {
-/*
-    static unsigned char sector[512];
-    static TXpgFileHead  head;
+    char tmpbuf[64];
+    unsigned char sector[512];
+    unsigned sum, i;
+    TXpgFileHead  head;
     memset(sector, 0, 512);
     memset(&head, 0, sizeof(head));
+    
     strcpy(head.name, filename);
+    strcpy(head.mode, "0100777");
+    strcpy(head.uid, "0000000");
+    strcpy(head.gid, "0000000");
+    memset(tmpbuf, 0, sizeof(tmpbuf));
+    sprintf(tmpbuf, "%011o", (int)size);
+    strncpy(head.size, tmpbuf, 11);
+    memset(tmpbuf, 0, sizeof(tmpbuf));
+    sprintf(tmpbuf, "%011o", (int)time(NULL));
+    strncpy(head.mtime, tmpbuf, 11);
+    head.typeflag[0] = '0';
+    strcpy(head.magic, "ustar");
+    head.version[0] = '0';
+    head.version[1] = '0';
+    memset(head.chksum, ' ', sizeof(head.chksum));
     memcpy(sector, &head, sizeof(head));
-    sector[0] = 'M';
-    fwrite(sector, 512, 1, fp);   */
+    
+    sum = 0;
+    for (i = 0; i < 512; i++)
+        sum += sector[i];
+    memset(tmpbuf, 0, sizeof(tmpbuf));
+    sprintf(tmpbuf, "%06o", (int)sum);
+    strncpy(head.chksum, tmpbuf, 7);
 
-    int a = 0x12345678;
-    fwrite(&a, 4, 1, fp);
+    memcpy(sector, &head, sizeof(head));
+    fwrite(sector, 1, 512, fp);
 
     return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int writeTarData(FILE* fp, unsigned char* buf, unsigned int size)
+int writeTarData(FILE* fp, const unsigned char* buf, unsigned int size)
 {
-    int total = 0;
+    int rsize = (int)size;
+    int wsize = 0;
+    unsigned char sector[512];
+
+    while (rsize > 0)
+    {
+        if (rsize >= 512)
+        {
+            fwrite(&buf[wsize], 1, 512, fp);
+            wsize += 512;
+            rsize -= 512;
+        }
+        else
+        {
+            memset(sector, 0, sizeof(sector));
+            memcpy(sector, &buf[wsize], rsize);
+            fwrite(sector, 1, 512, fp);
+            wsize += rsize;
+            rsize -= rsize;
+        }
+    }
     
+    return wsize;
 }
 ///////////////////////////////////////////////////////////////////////////////
 bool XpgMovies::m_WriteNewFormatXPGFile(const char *filename)
 {
-    char tmpbuf[256];
+    static char tmpbuf[128];
     FILE * xpg = NULL;
-    FILE * tar = NULL;
     bool boNoErr = true;
+    std::vector<TPageSpriteInfo>  allpage;
 
     std::string tempdir;
     std::string tempfile;
@@ -918,7 +961,7 @@ bool XpgMovies::m_WriteNewFormatXPGFile(const char *filename)
     }
 
     // 写入PAGE表和脚本
-    std::vector<TPageSpriteInfo>  allpage;
+    allpage.clear();
     
     m_iPageCount = m_PageList->Count;
     for (int iPage = 0; iPage < m_iPageCount; iPage++)
@@ -1013,7 +1056,8 @@ bool XpgMovies::m_WriteNewFormatXPGFile(const char *filename)
         pPage->m_lHashKey = xpgHash(pPage->m_Name.c_str(), n);
         fwrite(&(pPage->m_lHashKey), 4, 1, xpg);
     }
-
+    fflush(xpg);
+    
     fseek(xpg, 0, SEEK_SET);
     fwrite("XPG6", 4, 1, xpg);
     unsigned dwTemp = 1;
@@ -1023,9 +1067,11 @@ bool XpgMovies::m_WriteNewFormatXPGFile(const char *filename)
     fwrite(&uRoleNum, 4, 1, xpg);
     fwrite(&uPageHeadOffset, 4, 1, xpg);
     fwrite(&uPageNum, 4, 1, xpg);
+    fflush(xpg);
     fclose(xpg);
 
     ///////////////////////////////////////////////////////
+
     unsigned char * pXpgIndexData;
     unsigned int    dwIndexDataSize;
     xpg = fopen(tempfile.c_str(), "rb");
@@ -1036,20 +1082,66 @@ bool XpgMovies::m_WriteNewFormatXPGFile(const char *filename)
     fread(pXpgIndexData, 1, dwIndexDataSize, xpg);
     fclose(xpg);
     unlink(tempfile.c_str());
+    
     ///////////////////////////////////////////////////////
 
-    tar = fopen(filename, "wb");
-    if (tar == NULL)
+    xpg = fopen(filename, "wb");
+    if (xpg == NULL)
         return false;
-        
-    //writeTarHead(tar, "index.xpg", dwIndexDataSize);
-    //writeTarData(tar, pXpgIndexData, dwIndexDataSize);
+    fseek(xpg, 0, SEEK_SET);    
+    writeTarHead(xpg, "index.xpg", dwIndexDataSize);
+    writeTarData(xpg, pXpgIndexData, dwIndexDataSize);
     free(pXpgIndexData);
 
-    int aaaa = 0x9;
-    fwrite(&aaaa, 4, 1, tar);
-           
-    fclose(tar);
+    for (int iRole = 0; iRole < m_iRoleCount; iRole++)
+    {
+        char picName[64];
+        m_pCurRole = (RoleImages *)m_RoleList->Items[iRole];
+        m_pCurRole->m_iIndex = iRole;
+
+        if (m_pCurRole->m_iImgSourceSize <= 0)
+        {
+            sprintf(picName, "%04d.jpg", iRole);
+            // Convert RoleData to ImgSource, adopted from
+            long lRoleData=0;
+            lRoleData = GetRoleData(m_pCurRole);                // m_WriteRoleData(FILE *fp, RoleImages *pCurRole)
+            m_pCurRole->m_iImgSourceSize = lRoleData;
+
+            AnsiString tempFileName = "tmp.jpg"; // read data from temp file
+            FILE *fpTemp;
+            if ((fpTemp = fopen(tempFileName.c_str(), "rb")) == NULL)
+                return NULL;
+            fseek( fpTemp, 0, SEEK_END );
+            long lFileSize = ftell( fpTemp );
+            long lDataLen = lFileSize;
+            if (lDataLen % 4 != 0)
+                lDataLen += 4 - (lDataLen % 4);
+            fseek( fpTemp, 0, SEEK_SET );
+            
+            unsigned char *pszBuffer;
+            pszBuffer = new unsigned char[lDataLen + 8];
+            memset(pszBuffer, 0, lDataLen + 8);
+            fread( pszBuffer, 1, lFileSize, fpTemp );
+            fclose(fpTemp);
+
+            writeTarHead(xpg, picName, m_pCurRole->m_iImgSourceSize);
+            if (m_pCurRole->m_iImgSourceSize > 0)
+                writeTarData(xpg, pszBuffer, m_pCurRole->m_iImgSourceSize);
+
+            delete[] pszBuffer;
+
+        }
+        else
+        {
+            sprintf(picName, "%04d.png", iRole);
+            
+            writeTarHead(xpg, picName, m_pCurRole->m_iImgSourceSize);
+            if (m_pCurRole->m_iImgSourceSize > 0)
+                writeTarData(xpg, m_pCurRole->m_pImgSource, m_pCurRole->m_iImgSourceSize);
+        }
+    }
+
+    fclose(xpg);
     
     return boNoErr;
     
@@ -1089,7 +1181,7 @@ bool XpgMovies::m_WriteNewFormatXPGFile(const char *filename)
                 if (m_pCurRole->m_iImgSourceSize <= 0)
                 { // Convert RoleData to ImgSource, adopted from
                         long lRoleData=0;
-                        lRoleData = GetRoleData(fp, m_pCurRole);  // m_WriteRoleData(FILE *fp, RoleImages *pCurRole)
+                        lRoleData = GetRoleData(m_pCurRole);  // m_WriteRoleData(FILE *fp, RoleImages *pCurRole)
                         m_pCurRole->m_iImgSourceSize = lRoleData;
                         fwrite(&(m_pCurRole->m_iImgSourceSize), 4, 1, fp);
 
