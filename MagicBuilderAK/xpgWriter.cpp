@@ -878,6 +878,18 @@ int writeTarData(FILE* fp, const unsigned char* buf, unsigned int size)
     return wsize;
 }
 ///////////////////////////////////////////////////////////////////////////////
+const char * getFileExtByContent(const unsigned char* buf)
+{
+    if (buf[1] == 'P' && buf[2] == 'N' && buf[3] == 'G')
+        return "png";
+    else if (buf[0] == 0xff && buf[1] == 0xd8)
+        return "jpg";
+    else if (buf[0] == 'G' && buf[1] == 'I' && buf[2] == 'F')
+        return "jpg";
+    else
+        return "bin";
+}
+///////////////////////////////////////////////////////////////////////////////
 bool XpgMovies::m_WriteNewFormatXPGFile(const char *filename)
 {
     static char tmpbuf[128];
@@ -1101,7 +1113,6 @@ bool XpgMovies::m_WriteNewFormatXPGFile(const char *filename)
 
         if (m_pCurRole->m_iImgSourceSize <= 0)
         {
-            sprintf(picName, "%04d.jpg", iRole);
             // Convert RoleData to ImgSource, adopted from
             long lRoleData=0;
             lRoleData = GetRoleData(m_pCurRole);                // m_WriteRoleData(FILE *fp, RoleImages *pCurRole)
@@ -1124,6 +1135,7 @@ bool XpgMovies::m_WriteNewFormatXPGFile(const char *filename)
             fread( pszBuffer, 1, lFileSize, fpTemp );
             fclose(fpTemp);
 
+            sprintf(picName, "%04d.jpg", iRole, getFileExtByContent(pszBuffer));
             writeTarHead(xpg, picName, m_pCurRole->m_iImgSourceSize);
             if (m_pCurRole->m_iImgSourceSize > 0)
                 writeTarData(xpg, pszBuffer, m_pCurRole->m_iImgSourceSize);
@@ -1133,7 +1145,7 @@ bool XpgMovies::m_WriteNewFormatXPGFile(const char *filename)
         }
         else
         {
-            sprintf(picName, "%04d.png", iRole);
+            sprintf(picName, "%04d.%s", iRole, getFileExtByContent(m_pCurRole->m_pImgSource));
             
             writeTarHead(xpg, picName, m_pCurRole->m_iImgSourceSize);
             if (m_pCurRole->m_iImgSourceSize > 0)
