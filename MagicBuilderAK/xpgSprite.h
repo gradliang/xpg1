@@ -40,6 +40,9 @@ public:
     long  m_iInkValue;
 
     AnsiString m_Name;
+
+    long  m_touchEnable;
+    long  m_touchFlag;
 public:
     Sprites();
     ~Sprites();

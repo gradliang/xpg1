@@ -5,7 +5,7 @@
 #include <vector>
 #include <string>
 #include <stdlib.h>
-
+#include <io.h>
 #include "xpgHash.h"
 #include "BMGUtils.h"
 #include "BMGDLL.h"
@@ -785,28 +785,55 @@ len = 16
     return true;
 }
 ///////////////////////////////////////////////////////////////////////////////
-struct TXpgFileHead_1 {
-    unsigned char name[100];    // name  name of file
-    unsigned char mode[8];      // mode  file mode
-    unsigned char uid[8];       // uid  owner user ID
-    unsigned char gid[8];       // gid  owner group ID
-    unsigned char size[12];     // size  length of file in bytes
-    unsigned char mtime[12];    // mtime  modify time of file
-    unsigned char chksum[8];    // chksum  checksum for header
-    unsigned char typeflag[1];  // typeflag  type of file
-    unsigned char linkname[100];// linkname  name of linked file
-    unsigned char magic[6];     // magic  USTAR indicator
-    unsigned char version[2];   // version  USTAR version
-    unsigned char uname[32];    // uname  owner user name
-    unsigned char gname[32];    // gname  owner group name
-    unsigned char devmajor[8];  // devmajor  device major number
-    unsigned char devminor[8];  // devminor  device minor number
-    unsigned char prefix[155];  // prefix  prefix for file name
+struct TXpgFileHead {
+    char name[100];    // name  name of file
+    char mode[8];      // mode  file mode
+    char uid[8];       // uid  owner user ID
+    char gid[8];       // gid  owner group ID
+    char size[12];     // size  length of file in bytes
+    char mtime[12];    // mtime  modify time of file
+    char chksum[8];    // chksum  checksum for header
+    char typeflag[1];  // typeflag  type of file
+    char linkname[100];// linkname  name of linked file
+    char magic[6];     // magic  USTAR indicator
+    char version[2];   // version  USTAR version
+    char uname[32];    // uname  owner user name
+    char gname[32];    // gname  owner group name
+    char devmajor[8];  // devmajor  device major number
+    char devminor[8];  // devminor  device minor number
+    char prefix[155];  // prefix  prefix for file name
 };
-union TXpgFileHead{
-    unsigned char   rawdata[512];
-    TXpgFileHead_1  head;
+struct TPageSpriteInfo {
+    unsigned int uSprite0_offset;
+    unsigned int uSprite_num;
+    unsigned int uScript_offset;
+    unsigned int uCmd_num;
 };
+///////////////////////////////////////////////////////////////////////////////
+int writeTarHead(FILE* fp, const char* filename, unsigned int size)
+{
+/*
+    static unsigned char sector[512];
+    static TXpgFileHead  head;
+    memset(sector, 0, 512);
+    memset(&head, 0, sizeof(head));
+    strcpy(head.name, filename);
+    memcpy(sector, &head, sizeof(head));
+    sector[0] = 'M';
+    fwrite(sector, 512, 1, fp);   */
+
+    int a = 0x12345678;
+    fwrite(&a, 4, 1, fp);
+
+    return 0;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+int writeTarData(FILE* fp, unsigned char* buf, unsigned int size)
+{
+    int total = 0;
+    
+}
 ///////////////////////////////////////////////////////////////////////////////
 bool XpgMovies::m_WriteNewFormatXPGFile(const char *filename)
 {
@@ -814,27 +841,26 @@ bool XpgMovies::m_WriteNewFormatXPGFile(const char *filename)
     FILE * xpg = NULL;
     FILE * tar = NULL;
     bool boNoErr = true;
-    static TXpgFileHead  fhead;
+
     std::string tempdir;
     std::string tempfile;
     const char * p;
     unsigned int uRoleTabOffset, uRoleNum;
-    unsigned int uPageTabOffset, uPageNum;
 
     tempdir = getenv("TEMP");
     p = tempdir.c_str();
     if (p[strlen(p) - 1] != '\\')
         tempdir += "\\";
 
-    sprintf(tmpbuf, "zzzzzzz_%05d%05d.xpg",1,1 /*rand(), rand()*/);
+    sprintf(tmpbuf, "zzzzzzz_%05d%05d.xpg", rand(), rand());
     tempfile = tempdir + tmpbuf;
     
     xpg = fopen(tempfile.c_str(), "wb");
     if (xpg == NULL)
         return false;
 
-    memset(&fhead, 0, 512);
-    fwrite(&fhead, 1, 512, xpg);
+    memset(tmpbuf, 0, 128);
+    fwrite(tmpbuf, 1, 128, xpg);
 
     // 写入ROLE表
     uRoleTabOffset = ftell(xpg);
@@ -892,77 +918,141 @@ bool XpgMovies::m_WriteNewFormatXPGFile(const char *filename)
     }
 
     // 写入PAGE表和脚本
-    uPageTabOffset = ftell(xpg);
-    uPageNum = m_iPageCount = m_PageList->Count;
+    std::vector<TPageSpriteInfo>  allpage;
+    
+    m_iPageCount = m_PageList->Count;
     for (int iPage = 0; iPage < m_iPageCount; iPage++)
     {
-    }
+        TPageSpriteInfo  myPageSpritesInfo;
+        
+        // Write Sprite Data
+        Pages *pPage = (Pages *)m_PageList->Items[iPage];
+        pPage->m_iIndex = iPage;
+        pPage->m_lSpriteFilePos = ftell(xpg);
+        pPage->m_iSpriteCount = pPage->m_SpriteList->Count;
 
-                                                          /*
-        fseek( fp, m_lPageHeaderPos + m_iPageCount * m_iPageHeaderLen, SEEK_SET );
-        for (int iPage = 0; iPage < m_iPageCount; iPage++)
+        myPageSpritesInfo.uSprite0_offset = ftell(xpg);
+        myPageSpritesInfo.uSprite_num = pPage->m_iSpriteCount;
+
+        for (int iSprite = 0; iSprite < pPage->m_iSpriteCount; iSprite++)
         {
-            // Write Sprite Data
-            Pages *pPage = (Pages *)m_PageList->Items[iPage];
-            pPage->m_iIndex = iPage;
-            pPage->m_lSpriteFilePos = ftell(fp);
+            Sprites *pSprite = (Sprites *)(pPage->m_SpriteList->Items[iSprite]);
+            pSprite->m_iIndex = iSprite;
+            
+            fwrite(&(pSprite->m_iIndex), 4, 1, xpg);            // Layer
+            fwrite(&(pSprite->m_iPx), 4, 1, xpg);               // X
+            fwrite(&(pSprite->m_iPy), 4, 1, xpg);               // Y
+            fwrite(&(pSprite->m_iRole), 4, 1, xpg);             // Image Index
+            int iType = (pSprite->m_iType << 16) | pSprite->m_iTypeIndex;
+            fwrite(&(iType), 4, 1, xpg);
 
-            pPage->m_iSpriteCount = pPage->m_SpriteList->Count;
-            for (int iSprite = 0; iSprite < pPage->m_iSpriteCount; iSprite++)
+            fwrite(&(pSprite->m_touchEnable), 4, 1, xpg);       // touch Enable
+            fwrite(&(pSprite->m_touchFlag), 4, 1, xpg);         // touch Flag
+        }
+        
+        // Write Script Data
+        myPageSpritesInfo.uScript_offset = ftell(xpg);
+        int iCommandCount = pPage->GetCommandCount();
+        pPage->m_lScriptFilePos = 0;
+        pPage->m_lScriptFilePos = ftell(xpg);
+        if (iCommandCount > 0)
+        {
+            fwrite(&iCommandCount, 4, 1, xpg);
+            for (int iScript = 0; iScript < XPG_COMMAND_COUNT; iScript++)
             {
-                Sprites *pSprite = (Sprites *)(pPage->m_SpriteList->Items[iSprite]);
-                pSprite->m_iIndex = iSprite;
-                m_WriteSpriteData(fp, pSprite);
-            }
+                if (pPage->m_Command[iScript].m_boEmpty)
+                    continue;                    
 
-            // Write Script Data
-            int iCommandCount = pPage->GetCommandCount();
-
-            pPage->m_lScriptFilePos = 0;
-            if (iCommandCount > 0)
-            {
-                pPage->m_lScriptFilePos = ftell(fp);
-
-                fwrite(&iCommandCount, 4, 1, fp);
-                for (int iScript = 0; iScript < XPG_COMMAND_COUNT; iScript++)
-                {
-                	if (pPage->m_Command[iScript].m_boEmpty)
-                       continue;                    
-
-                    AnsiString strButton = 	pPage->GetCommandButton(iScript); 
-					AnsiString strPage = 	pPage->GetCommandPage(iScript);
-					AnsiString strAction = 	pPage->GetCommandAction(iScript);
+                AnsiString strButton = 	pPage->GetCommandButton(iScript);
+                AnsiString strPage = 	pPage->GetCommandPage(iScript);
+                AnsiString strAction = 	pPage->GetCommandAction(iScript);
 				
-					WORD wButtonKey = m_GetButtonKey(strButton) - 1;
-					WORD wPageKey   = m_GetPageKey(strPage);
-					WORD wActionKey = m_GetActionKey(strAction) + 1;  
-					WORD wTemp = 0;
+                WORD wButtonKey = m_GetButtonKey(strButton) - 1;
+                WORD wPageKey   = m_GetPageKey(strPage);
+                WORD wActionKey = m_GetActionKey(strAction) + 1;
+                WORD wTemp = 0;
 					
-					fwrite(&(wButtonKey), 2, 1, fp);
-					fwrite(&(wTemp), 2, 1, fp);
-					
-					fwrite(&(wPageKey), 2, 1, fp);
-					fwrite(&(wTemp), 2, 1, fp);
-					
-					fwrite(&(wActionKey), 2, 1, fp);
-					fwrite(&(wTemp), 2, 1, fp);
-
-                    if (m_boXPW) {
-                        char buf[33];
-                        memset(buf, 0, 33);
-                        strcpy( buf, strPage.c_str() );
-                        fwrite((buf), 1, 16, fp);
-                        strcpy( buf, strAction.c_str() );
-                        fwrite((buf), 1, 32, fp);
-                    }   
-                }
+                fwrite(&(wButtonKey), 2, 1, xpg);
+                fwrite(&(wPageKey), 2, 1, xpg);
+                fwrite(&(wActionKey), 2, 1, xpg);
+                fwrite(&(wTemp), 2, 1, xpg);
             }
         }
-                                  */
+        else
+        {
+            iCommandCount = 0;
+            fwrite(&iCommandCount, 4, 1, xpg);
+        }
+        myPageSpritesInfo.uCmd_num = iCommandCount;
+        
+        allpage.push_back(myPageSpritesInfo);
+    }
+
+    // Write Page Header
+    unsigned int uPageHeadOffset, uPageNum;
+    uPageHeadOffset = ftell(xpg);
+    uPageNum = m_iPageCount;
     
+    for (int iPage = 0; iPage < m_iPageCount; iPage++)
+    {
+        unsigned int temp;
+        Pages *pPage = (Pages *)m_PageList->Items[iPage];
+        
+        fwrite(&(pPage->m_iIndex), 4, 1, xpg);
+        
+        temp = allpage[iPage].uSprite0_offset;
+        fwrite(&temp, 4, 1, xpg);
+        temp = allpage[iPage].uSprite_num;
+        fwrite(&temp, 4, 1, xpg);
+        temp = allpage[iPage].uScript_offset;
+        fwrite(&temp, 4, 1, xpg);
+        temp = allpage[iPage].uCmd_num;
+        fwrite(&temp, 4, 1, xpg);
+
+        int n = pPage->m_Name.Length();
+        pPage->m_lHashKey = xpgHash(pPage->m_Name.c_str(), n);
+        fwrite(&(pPage->m_lHashKey), 4, 1, xpg);
+    }
+
+    fseek(xpg, 0, SEEK_SET);
+    fwrite("XPG6", 4, 1, xpg);
+    unsigned dwTemp = 1;
+    fwrite(&dwTemp, 4, 1, xpg);
+
+    fwrite(&uRoleTabOffset, 4, 1, xpg);
+    fwrite(&uRoleNum, 4, 1, xpg);
+    fwrite(&uPageHeadOffset, 4, 1, xpg);
+    fwrite(&uPageNum, 4, 1, xpg);
     fclose(xpg);
 
+    ///////////////////////////////////////////////////////
+    unsigned char * pXpgIndexData;
+    unsigned int    dwIndexDataSize;
+    xpg = fopen(tempfile.c_str(), "rb");
+    if (xpg == NULL)
+        return false;
+    dwIndexDataSize = filelength(fileno(xpg));
+    pXpgIndexData = (unsigned char *) malloc(dwIndexDataSize);
+    fread(pXpgIndexData, 1, dwIndexDataSize, xpg);
+    fclose(xpg);
+    unlink(tempfile.c_str());
+    ///////////////////////////////////////////////////////
+
+    tar = fopen(filename, "wb");
+    if (tar == NULL)
+        return false;
+        
+    //writeTarHead(tar, "index.xpg", dwIndexDataSize);
+    //writeTarData(tar, pXpgIndexData, dwIndexDataSize);
+    free(pXpgIndexData);
+
+    int aaaa = 0x9;
+    fwrite(&aaaa, 4, 1, tar);
+           
+    fclose(tar);
+    
     return boNoErr;
+    
 /*
     FILE *fp = NULL;		 target file 
     bool boNoErr = true;
@@ -1048,12 +1138,7 @@ bool XpgMovies::m_WriteNewFormatXPGFile(const char *filename)
         fputc(0, fp);
         fputc(0, fp);
 
-        // Write Page Header
-        for (int iPage = 0; iPage < m_iPageCount; iPage++)
-        {
-            fseek( fp, m_lPageHeaderPos + iPage * m_iPageHeaderLen, SEEK_SET );
-            m_WritePageHeader(fp, (Pages *)(m_PageList->Items[iPage]));
-        }
+        
     }
 
     if (boNoErr) {
@@ -1077,6 +1162,7 @@ bool XpgMovies::m_WriteNewFormatXPGFile(const char *filename)
     return boNoErr;
     */
 }
+
 
 #if 1
 //**********************************************************************************
