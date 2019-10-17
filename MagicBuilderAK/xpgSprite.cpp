@@ -16,6 +16,9 @@ Sprites::Sprites()
     m_pRole = NULL;
     m_pMovie = NULL;
     m_pPage = NULL;
+    //////////////////////////
+    m_touchEnable = 0;
+    m_touchFlag = 0;
 }
 //---------------------------------------------------------------------------
 

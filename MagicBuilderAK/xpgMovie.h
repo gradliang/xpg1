@@ -210,6 +210,7 @@ public:
     bool  m_boXPG;
     bool  m_boXPW;
     bool  m_boVersion4;
+    bool  m_isAnykaExt;         // Anyka Ext
     long  m_iNewScreenWidth;      //Screen Width, 40,2
     long  m_iNewScreenHeight;     //Screen Height, 42,2
     long  m_iSettingCount;

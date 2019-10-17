@@ -145,15 +145,30 @@ bool XpgMovies::m_ReadHeader(FILE *fp)
     m_boXPW = false;
     m_boVersion4 = false;
     fread( &ch, 1, 4, fp );
-    if ( ch[0] == 'x' && ch[1] == 'p' ) {
+    if ( ch[0] == 'x' && ch[1] == 'p' )
+    {
         if ( ch[2] == 'w' )
             m_boXPW = true;
         else  if ( ch[2] == 'g' )
             m_boXPG = true;
-    } else {
+        m_isAnykaExt = false;
+    }
+    else
+    {
         if(ch[0] == 'X' && ch[1] == 'P' && ch[2] == 'W' && ch[3] == '4' )
-	    { m_boXPW = true; m_boVersion4 = true;}
-        else return false;
+	    {
+            m_boXPW = true;
+            m_boVersion4 = true;
+            m_isAnykaExt = false;
+        }
+        else if(ch[0] == 'X' && ch[1] == 'P' && ch[2] == 'W' && ch[3] == 'E' )
+        {
+            m_boXPW = true;
+            m_boVersion4 = true;
+            m_isAnykaExt = true;
+        }
+        else
+            return false;
     }
 
     //temp skip header info
@@ -492,7 +507,29 @@ ink value	3	9
 	pSprite->m_iType = (iType >> 16) & 0xffff;
 	pSprite->m_iTypeIndex = iType & 0xffff;
     fread(&(pSprite->m_lHashKey), 4, 1, fp);
-    if (m_boXPW) {
+
+    if (m_isAnykaExt)
+    {
+        unsigned temp;
+        fread(&temp, 4, 1, fp);
+        pSprite->m_touchEnable = temp;
+        fread(&temp, 4, 1, fp);
+        pSprite->m_touchFlag = temp;
+        fread(&temp, 4, 1, fp);                 // ±£Áô
+        fread(&temp, 4, 1, fp);
+        fread(&temp, 4, 1, fp);
+        fread(&temp, 4, 1, fp);
+        fread(&temp, 4, 1, fp);
+        fread(&temp, 4, 1, fp);
+    }
+    else
+    {
+        pSprite->m_touchEnable = 0;
+        pSprite->m_touchFlag = 0;
+    }
+
+    if (m_boXPW)
+    {
         char buf[17];
         //strcpy( buf, pSprite->m_Name.c_str() );
         fread((buf), 1, 16, fp);

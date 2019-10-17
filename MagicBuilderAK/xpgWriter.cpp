@@ -205,7 +205,11 @@ bool XpgMovies::m_WriteHeader(FILE *fp)
     if (fp == NULL) return false;
 
     if (m_boXPW)
-        fwrite( "XPW4", 1, 4, fp );  //fwrite( "xpw0", 1, 4, fp );
+    {
+        //fwrite( "xpw0", 1, 4, fp );           // magic builder 2.x
+        //fwrite( "XPW4", 1, 4, fp );           // magic builder 4.x
+        fwrite( "XPWE", 1, 4, fp );             // magic builder 4.x (Anyka Platform Ext)
+    }
     else
         fwrite( "xpg0", 1, 4, fp );
 
@@ -741,6 +745,17 @@ ink value	3	9
     int n = pSprite->m_Name.Length();
     pSprite->m_lHashKey = xpgHash(pSprite->m_Name.c_str(), n);
     fwrite(&(pSprite->m_lHashKey), 4, 1, fp);
+
+    // anyka platform ext
+    int tempvar = 0;
+    fwrite(&(pSprite->m_touchEnable), 4, 1, fp);
+    fwrite(&(pSprite->m_touchFlag), 4, 1, fp);
+    fwrite(&tempvar, 4, 1, fp);                         // ±£¡Ù
+    fwrite(&tempvar, 4, 1, fp);
+    fwrite(&tempvar, 4, 1, fp);
+    fwrite(&tempvar, 4, 1, fp);
+    fwrite(&tempvar, 4, 1, fp);
+    fwrite(&tempvar, 4, 1, fp);
     
     if (m_boXPW) {
         char buf[17];
@@ -885,7 +900,9 @@ const char * getFileExtByContent(const unsigned char* buf)
     else if (buf[0] == 0xff && buf[1] == 0xd8)
         return "jpg";
     else if (buf[0] == 'G' && buf[1] == 'I' && buf[2] == 'F')
-        return "jpg";
+        return "gif";
+    else if (buf[0] == 'B' && buf[1] == 'M')
+        return "bmp";
     else
         return "bin";
 }
@@ -1156,115 +1173,6 @@ bool XpgMovies::m_WriteNewFormatXPGFile(const char *filename)
     fclose(xpg);
     
     return boNoErr;
-    
-/*
-    FILE *fp = NULL;		 target file 
-    bool boNoErr = true;
-
-    if ((fp = fopen(filename, "wb")) == NULL)
-        return false;
-
-    m_InitHeader(false);
-
-    // reserve 512 bytes for file header
-    if (m_boXPW)
-        fseek( fp, 1024, SEEK_SET );
-    else
-        fseek( fp, 512, SEEK_SET );
-    if (boNoErr)
-    {
-        // Write Role Image Data
-        m_lImageHeaderPos = ftell(fp);
-        fseek( fp, m_lImageHeaderPos + m_iRoleCount * m_iImageHeaderLen, SEEK_SET );
-        for (int iRole = 0; iRole < m_iRoleCount; iRole++)
-        {
-
-            m_pCurRole = (RoleImages *)m_RoleList->Items[iRole];
-            m_pCurRole->m_iIndex = iRole;
-            m_pCurRole->m_lFilePos = ftell(fp);
-
-            // if SaveXPW then Set off in XPW4, if SaveXPG then save
-            if( m_boXPW ) ; // skip  when SaveXPW
-            else  m_pCurRole->m_lDataLen = 0(fp, m_pCurRole); // SaveXPG
-
-            if (m_boXPW)
-            {
-                // extra write source
-                if (m_pCurRole->m_iImgSourceSize <= 0)
-                { // Convert RoleData to ImgSource, adopted from
-                        long lRoleData=0;
-                        lRoleData = GetRoleData(m_pCurRole);  // m_WriteRoleData(FILE *fp, RoleImages *pCurRole)
-                        m_pCurRole->m_iImgSourceSize = lRoleData;
-                        fwrite(&(m_pCurRole->m_iImgSourceSize), 4, 1, fp);
-
-                        AnsiString tempFileName = "tmp.jpg"; // read data from temp file
-                        FILE *fpTemp;
-                        if ((fpTemp = fopen(tempFileName.c_str(), "rb")) == NULL)
-                                return NULL;
-                        fseek( fpTemp, 0, SEEK_END );
-                        long lFileSize = ftell( fpTemp );
-                        long lDataLen = lFileSize;
-                        if (lDataLen % 4 != 0)
-                                lDataLen += 4 - (lDataLen % 4);
-                        fseek( fpTemp, 0, SEEK_SET );
-                        unsigned char *pszBuffer;
-                        pszBuffer = new unsigned char[lDataLen + 1];
-
-                        fread( pszBuffer, 1, lFileSize, fpTemp );
-                        fclose(fpTemp);
-                        fwrite(pszBuffer, 1, m_pCurRole->m_iImgSourceSize, fp);
-                        delete pszBuffer;
-
-                }
-                else
-                {
-                        fwrite(&(m_pCurRole->m_iImgSourceSize), 4, 1, fp);
-                        if (m_pCurRole->m_iImgSourceSize > 0)
-                                fwrite(m_pCurRole->m_pImgSource, 1, m_pCurRole->m_iImgSourceSize, fp);
-                }
-            }
-
-            if (m_pCurRole->m_lDataLen < 0) {
-                boNoErr = false;
-                break;
-            }
-        }
-
-        m_lPageHeaderPos = ftell(fp);
-        // Write Role Header
-        
-
-        // Write Page's Sprite & Script Data
-        
-
-        fputc(0, fp);
-        fputc(0, fp);
-        fputc(0, fp);
-        fputc(0, fp);
-
-        
-    }
-
-    if (boNoErr) {
-        fseek( fp, 0, SEEK_SET );
-        boNoErr = m_WriteHeader(fp);
-    }
-
-    if (boNoErr) {
-        fseek( fp, 0, SEEK_END );
-        long lFileSize = ftell(fp);
-        //char c = fgetc(fp);
-        if (lFileSize % 4 != 0) {
-            int n = 4 - (lFileSize % 4);
-            for (int i = 0; i < n; i++)
-                fputc(0, fp);
-
-        }
-    }
-
-    fclose(fp);
-    return boNoErr;
-    */
 }
 
 

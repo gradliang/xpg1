@@ -41,8 +41,8 @@ public:
 
     AnsiString m_Name;
 
-    long  m_touchEnable;
-    long  m_touchFlag;
+    unsigned m_touchEnable;
+    unsigned m_touchFlag;
 public:
     Sprites();
     ~Sprites();
