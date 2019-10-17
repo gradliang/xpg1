@@ -1020,6 +1020,13 @@ bool XpgMovies::m_WriteNewFormatXPGFile(const char *filename)
 
             fwrite(&(pSprite->m_touchEnable), 4, 1, xpg);       // touch Enable
             fwrite(&(pSprite->m_touchFlag), 4, 1, xpg);         // touch Flag
+            unsigned tempvar = 0;
+            fwrite(&tempvar, 4, 1, xpg);                        // ±£¡Ù
+            fwrite(&tempvar, 4, 1, xpg);
+            fwrite(&tempvar, 4, 1, xpg);
+            fwrite(&tempvar, 4, 1, xpg);
+            fwrite(&tempvar, 4, 1, xpg);
+            fwrite(&tempvar, 4, 1, xpg);
         }
         
         // Write Script Data
