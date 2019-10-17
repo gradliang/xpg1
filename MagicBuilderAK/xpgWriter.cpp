@@ -750,8 +750,8 @@ ink value	3	9
     int tempvar = 0;
     fwrite(&(pSprite->m_touchEnable), 4, 1, fp);
     fwrite(&(pSprite->m_touchFlag), 4, 1, fp);
+    fwrite(&(pSprite->m_flag), 4, 1, fp);
     fwrite(&tempvar, 4, 1, fp);                         // ±£¡Ù
-    fwrite(&tempvar, 4, 1, fp);
     fwrite(&tempvar, 4, 1, fp);
     fwrite(&tempvar, 4, 1, fp);
     fwrite(&tempvar, 4, 1, fp);
@@ -1020,9 +1020,9 @@ bool XpgMovies::m_WriteNewFormatXPGFile(const char *filename)
 
             fwrite(&(pSprite->m_touchEnable), 4, 1, xpg);       // touch Enable
             fwrite(&(pSprite->m_touchFlag), 4, 1, xpg);         // touch Flag
+            fwrite(&(pSprite->m_flag), 4, 1, xpg);              // flag
             unsigned tempvar = 0;
             fwrite(&tempvar, 4, 1, xpg);                        // ±£¡Ù
-            fwrite(&tempvar, 4, 1, xpg);
             fwrite(&tempvar, 4, 1, xpg);
             fwrite(&tempvar, 4, 1, xpg);
             fwrite(&tempvar, 4, 1, xpg);

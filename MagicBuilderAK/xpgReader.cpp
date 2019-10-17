@@ -515,8 +515,9 @@ ink value	3	9
         pSprite->m_touchEnable = temp;
         fread(&temp, 4, 1, fp);
         pSprite->m_touchFlag = temp;
-        fread(&temp, 4, 1, fp);                 // ±£Áô
         fread(&temp, 4, 1, fp);
+        pSprite->m_flag = temp;
+        fread(&temp, 4, 1, fp);                 // ±£Áô
         fread(&temp, 4, 1, fp);
         fread(&temp, 4, 1, fp);
         fread(&temp, 4, 1, fp);
@@ -526,6 +527,7 @@ ink value	3	9
     {
         pSprite->m_touchEnable = 0;
         pSprite->m_touchFlag = 0;
+        pSprite->m_flag = 0;
     }
 
     if (m_boXPW)

@@ -423,7 +423,9 @@ void __fastcall TwStage::UpdateSpriteValueEditor(TObject *Sender)
 	    ValueListEditor1->Cells[1][6] = String(pSprite->m_iTop);
 	    ValueListEditor1->Cells[1][7] = String(pSprite->m_iWidth);
 	    ValueListEditor1->Cells[1][8] = String(pSprite->m_iHeight);
-	    ValueListEditor1->Cells[1][9] = "";
+	    ValueListEditor1->Cells[1][9] = String(pSprite->m_flag);
+        ValueListEditor1->Cells[1][10] = String((int)(pSprite->m_touchEnable));
+        ValueListEditor1->Cells[1][11] = String((int)(pSprite->m_touchFlag));
 
         cbSprite->ItemIndex = pSprite->m_iIndex;
 	}
@@ -964,6 +966,42 @@ void __fastcall TwStage::ValueListEditor1EditButtonClick(TObject *Sender)
             pEditSprite->m_MoveTo(pEditSprite->m_iLeft,iTop);
             UpdateEditSprite(Sender);
         }
+        else if(iRow == 9) //Set flag
+        {
+            int iValue = 0;
+            int boInt = TryStrToInt(ValueListEditor1->Cells[iCol][iRow], iValue);
+            if(!boInt)
+            {
+                ShowMessage("Please enter a valid Ingeter.");
+                return;
+            }
+            pEditSprite->m_flag = iValue;
+            UpdateEditSprite(Sender);
+        }
+        else if(iRow == 10) //Set touch enable
+        {
+            int iValue = 0;
+            int boInt = TryStrToInt(ValueListEditor1->Cells[iCol][iRow], iValue);
+            if(!boInt)
+            {
+                ShowMessage("Please enter a valid Ingeter.");
+                return;
+            }
+            pEditSprite->m_touchEnable = iValue;
+            UpdateEditSprite(Sender);
+        }
+        else if(iRow == 11) //Set touch flag
+        {
+            int iValue = 0;
+            int boInt = TryStrToInt(ValueListEditor1->Cells[iCol][iRow], iValue);
+            if(!boInt)
+            {
+                ShowMessage("Please enter a valid Ingeter.");
+                return;
+            }
+            pEditSprite->m_touchFlag = iValue;
+            UpdateEditSprite(Sender);
+        }
         wMain->boModified = true;
     }
 
@@ -1012,6 +1050,21 @@ void __fastcall TwStage::ValueListEditor1SetEditText(TObject *Sender,
     else if(iRow == 6) //Set Y
     {
         pEditSprite->m_MoveTo(pEditSprite->m_iLeft, iValue);
+    }
+    else if(iRow == 9) //Set enable
+    {
+        pEditSprite->m_flag = iValue;
+        UpdateEditSprite(Sender);
+    }
+    else if(iRow == 10) //Set touch enable
+    {
+        pEditSprite->m_touchEnable = iValue;
+        UpdateEditSprite(Sender);
+    }
+    else if(iRow == 11) //Set touch flag
+    {
+        pEditSprite->m_touchFlag = iValue;
+        UpdateEditSprite(Sender);
     }
     wMain->boModified = true;
 }

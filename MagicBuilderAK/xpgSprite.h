@@ -43,6 +43,7 @@ public:
 
     unsigned m_touchEnable;
     unsigned m_touchFlag;
+    int m_flag;
 public:
     Sprites();
     ~Sprites();
