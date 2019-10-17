@@ -3,7 +3,7 @@ object wMain: TwMain
   Top = 104
   Width = 798
   Height = 564
-  Caption = 'MagicBuilderAK 1.00.20191018 (base on mpx4.1.12) - '
+  Caption = 'MagicBuilder AK47 1.00.20191018 (base on mpx4.1.12) - '
   Color = clAppWorkSpace
   UseDockManager = True
   DockSite = True
