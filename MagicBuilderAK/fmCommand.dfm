@@ -2,7 +2,7 @@ object wCommand: TwCommand
   Left = 591
   Top = 178
   Width = 611
-  Height = 496
+  Height = 541
   BorderIcons = [biSystemMenu, biMinimize]
   Caption = 'Page Commands'
   Color = clBtnFace
@@ -26,7 +26,7 @@ object wCommand: TwCommand
     Left = 0
     Top = 0
     Width = 441
-    Height = 462
+    Height = 502
     Align = alLeft
     BevelInner = bvRaised
     BevelOuter = bvLowered
@@ -88,7 +88,7 @@ object wCommand: TwCommand
       Left = 2
       Top = 41
       Width = 437
-      Height = 419
+      Height = 459
       Align = alClient
       BevelInner = bvRaised
       BevelOuter = bvNone
@@ -100,7 +100,7 @@ object wCommand: TwCommand
         Left = 7
         Top = 7
         Width = 419
-        Height = 367
+        Height = 407
         Align = alClient
         BiDiMode = bdRightToLeft
         ColCount = 3
@@ -174,7 +174,7 @@ object wCommand: TwCommand
       end
       object ToolBar1: TToolBar
         Left = 7
-        Top = 374
+        Top = 414
         Width = 419
         Height = 34
         Align = alBottom

@@ -295,7 +295,7 @@ void __fastcall TwMain::SaveXPG1Click(TObject *Sender)
 
     if ( o->Execute() )
     {
-        if (DlgQuality->ShowModal() == mrOk)
+        if (1)//(DlgQuality->ShowModal() == mrOk)
         {
             TCursor Save_Cursor = Screen->Cursor;
             Screen->Cursor = crHourGlass;    // Show hourglass cursor

@@ -1,8 +1,8 @@
 object wMovSet: TwMovSet
-  Left = 889
-  Top = 185
-  Width = 371
-  Height = 475
+  Left = 560
+  Top = 234
+  Width = 378
+  Height = 468
   BorderIcons = [biSystemMenu, biMinimize]
   Caption = 'Movie Setting'
   Color = clBtnFace
@@ -31,7 +31,7 @@ object wMovSet: TwMovSet
   object ToolBar1: TToolBar
     Left = 0
     Top = 0
-    Width = 363
+    Width = 362
     Height = 28
     AutoSize = True
     ButtonHeight = 24

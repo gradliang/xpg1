@@ -918,7 +918,8 @@ bool XpgMovies::m_WriteNewFormatXPGFile(const char *filename)
     std::string tempfile;
     const char * p;
     unsigned int uRoleTabOffset, uRoleNum;
-
+    unsigned tempvar = 0;
+    
     tempdir = getenv("TEMP");
     p = tempdir.c_str();
     if (p[strlen(p) - 1] != '\\')
@@ -983,7 +984,10 @@ bool XpgMovies::m_WriteNewFormatXPGFile(const char *filename)
         fputc(curRole->m_cBpp & 0xff, xpg);
         fputc(curRole->m_iType & 0xff, xpg);
         fputc(0, xpg);
-        
+
+        fwrite(&tempvar, 4, 1, xpg);                        // 保留
+        fwrite(&tempvar, 4, 1, xpg);                        // 保留
+        fwrite(&tempvar, 4, 1, xpg);                        // 保留
         //int n = curRole->m_Name.Length();
         //curRole->m_lHashKey = xpgHash(curRole->m_Name.c_str(), n);
         //fwrite(&(curRole->m_lHashKey), 4, 1, xpg);
@@ -1021,7 +1025,7 @@ bool XpgMovies::m_WriteNewFormatXPGFile(const char *filename)
             fwrite(&(pSprite->m_touchEnable), 4, 1, xpg);       // touch Enable
             fwrite(&(pSprite->m_touchFlag), 4, 1, xpg);         // touch Flag
             fwrite(&(pSprite->m_flag), 4, 1, xpg);              // flag
-            unsigned tempvar = 0;
+
             fwrite(&tempvar, 4, 1, xpg);                        // 保留
             fwrite(&tempvar, 4, 1, xpg);
             fwrite(&tempvar, 4, 1, xpg);

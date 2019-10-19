@@ -65,7 +65,7 @@ void __fastcall TwMovSet::LoadMovieCommandSet(AnsiString FileName)
     TIniFile *ini;
     ini = new TIniFile( FileName );
 	
-    if (ini == NULL || !ini->SectionExists("BUTTON")
+    if (ini == NULL || !ini->SectionExists("EVENT")
 		|| !ini->SectionExists("ACTION")
 		|| !ini->SectionExists("SPRITETYPE")) 
 	{
@@ -75,19 +75,19 @@ void __fastcall TwMovSet::LoadMovieCommandSet(AnsiString FileName)
 
 	gCommandSetFileName = FileName;
 
-    ini->DeleteKey("BUTTON", "count");
+    ini->DeleteKey("EVENT", "count");
     ini->DeleteKey("ACTION", "count");
     ini->DeleteKey("SPRITETYPE", "count");
                                     
     TStringList *TempList = new TStringList;
-    ini->ReadSection("BUTTON", TempList);
+    ini->ReadSection("EVENT", TempList);
     ini->ReadSection("ACTION", TempList);
     ini->ReadSection("SPRITETYPE", TempList);
 
     // read Button List
 	xpgMovie->m_ButtonList.Clear();
 
-	AnsiString CurSection = "BUTTON";
+	AnsiString CurSection = "EVENT";
     ini->ReadSection(CurSection,TempList);
     int n = TempList->Count;
 	xpgMovie->m_ButtonList.Add(0, 0, "NULL");
@@ -95,8 +95,8 @@ void __fastcall TwMovSet::LoadMovieCommandSet(AnsiString FileName)
     {
         AnsiString strKey = TempList->Strings[i];
 		AnsiString strName = ini->ReadString( CurSection, strKey, strKey );
-        int pos = strKey.Pos("button");
-        int iKey = StrToInt(strKey.SubString(pos + 6, 3));
+        int pos = strKey.Pos("event");
+        int iKey = StrToInt(strKey.SubString(pos + 5, 3));
 
 		xpgMovie->m_ButtonList.Add(i, iKey, strName);
     }
