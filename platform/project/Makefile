@@ -6,6 +6,7 @@ TARGET = project1
 LIB_DEP = #plat_ao plat_common plat_log plat_mem plat_thread pthread akaudiofilter plat_osal plat_drv 
 
 LIBS = $(addprefix -l,$(LIB_DEP))
+LIBS += -lxpg 
 
 TOPDIR 	?= $(shell pwd)/..
 
