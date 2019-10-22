@@ -5,6 +5,8 @@
 
 typedef struct {
 	FILE *		fileHandle;
+	u8_t *		headdata;
+	u32_t		headsize;
 }XpgFileInfo;
 
 typedef struct {
@@ -23,7 +25,7 @@ void* loadXpg(const char * filepath)
 	char flag[8];
 	CommonFileInfo fileinfo;
 	u8_t headdata[512];
-	size_t  rdsize;
+	size_t  rdsize, filecount;
 	u32_t skipsize;
 	
 	if (filepath == NULL || filepath[0] == 0) {
@@ -56,6 +58,7 @@ void* loadXpg(const char * filepath)
 
 	fseek(xpghandle, 0, SEEK_SET);
 
+	filecount = 0;
 	while (1)
 	{
 		rdsize = fread(headdata, 1, 512, xpghandle);
@@ -76,8 +79,16 @@ void* loadXpg(const char * filepath)
 		skipsize *= 512;
 		if (fileinfo.filesize % 512)
 			skipsize += 512;
-		fseek(xpghandle, skipsize, SEEK_CUR);
+		if (filecount == 0) {
+			xpg->headdata = (u8_t*) malloc(skipsize);
+			xpg->headsize = fileinfo.filesize;
+			fread(xpg->headdata, 1, skipsize, xpghandle);
+		}
+		else {
+			fseek(xpghandle, skipsize, SEEK_CUR);
+		}
 
+		filecount ++;
 		//printf("file=%s, size=%d \n", fileinfo.fileName, fileinfo.filesize);
 	}
 	
@@ -98,6 +109,13 @@ int closeXpg(void * handle)
 		xpg->fileHandle = NULL;
 	}
 
+	if (xpg->headdata != NULL) {
+		free(xpg->headdata);
+		xpg->headdata = NULL;
+		xpg->headsize = 0;
+	}
+
+	free(xpg);
 	return PASS;
 }
 

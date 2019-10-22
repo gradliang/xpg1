@@ -12,8 +12,9 @@ extern "C" {
 typedef unsigned char   u8_t;
 typedef unsigned short  u16_t;
 typedef unsigned int    u32_t;
+typedef void *          XPGHandle;
 
-void* loadXpg(const char * filepath);
+XPGHandle loadXpg(const char * filepath);
 int closeXpg(void * handle);
 
 
