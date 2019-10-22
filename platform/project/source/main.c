@@ -3,7 +3,7 @@
 
 int main(int argc, char ** argv)
 {
-    LoadXpg("");
+    loadXpg("1.xpg");
     return 0;
 }
 

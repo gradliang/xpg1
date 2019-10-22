@@ -6,12 +6,15 @@
 extern "C" {
 #endif
 
+#define PASS    (0)
+#define FAIL    (-1)
+
 typedef unsigned char   u8_t;
 typedef unsigned short  u16_t;
 typedef unsigned int    u32_t;
 
-void* LoadXpg(const char * filepath);
-int CloseXpg(void * handle);
+void* loadXpg(const char * filepath);
+int closeXpg(void * handle);
 
 
 #ifdef __cplusplus
