@@ -1095,6 +1095,10 @@ bool XpgMovies::m_WriteNewFormatXPGFile(const char *filename)
         int n = pPage->m_Name.Length();
         pPage->m_lHashKey = xpgHash(pPage->m_Name.c_str(), n);
         fwrite(&(pPage->m_lHashKey), 4, 1, xpg);
+
+        tempvar = 0;
+        fwrite(&tempvar, 4, 1, xpg);                        // ±£¡Ù
+        fwrite(&tempvar, 4, 1, xpg);                        // ±£¡Ù
     }
     fflush(xpg);
     
