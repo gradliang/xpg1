@@ -988,6 +988,7 @@ bool XpgMovies::m_WriteNewFormatXPGFile(const char *filename)
         fwrite(&tempvar, 4, 1, xpg);                        // 保留
         fwrite(&tempvar, 4, 1, xpg);                        // 保留
         fwrite(&tempvar, 4, 1, xpg);                        // 保留
+        fwrite(&tempvar, 4, 1, xpg);                        // 保留
         //int n = curRole->m_Name.Length();
         //curRole->m_lHashKey = xpgHash(curRole->m_Name.c_str(), n);
         //fwrite(&(curRole->m_lHashKey), 4, 1, xpg);
