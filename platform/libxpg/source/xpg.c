@@ -19,16 +19,17 @@ typedef struct {
 
 RawRoleInfo   * g_rawRoles = NULL;
 RawSpriteInfo * g_rawSprites = NULL;
-RawScriptInfo * g_rawScripts = NULL;
+RawCommandInfo* g_rawCommands = NULL;
 RawPageInfo   * g_rawPages = NULL;
 u32_t           g_rawRoleNum = 0;
 u32_t           g_rawSpriteNum = 0;
-u32_t           g_rawScriptNum = 0;
+u32_t           g_rawCommandNum = 0;
 u32_t           g_rawPageNum = 0;
 
 static int getHeadDataInfo(u8_t * data, CommonFileInfo * pFileInfo);
 static u32_t o2u(const u8_t * str);
 static u32_t getU32(const u8_t * buffer, u32_t index);
+static u16_t getU16(const u8_t * buffer, u32_t index);
 
 void* loadXpg(const char * filepath)
 {
@@ -40,7 +41,7 @@ void* loadXpg(const char * filepath)
 	u8_t headdata[512];
 	size_t  rdsize, filecount;
 	u32_t skipsize;
-	u32_t i, j;
+	u32_t i, j, k;
 	u8_t *	xpgdata;					// xpg head file data
 	u32_t	xpgsize;					// xpg head file size
 	
@@ -141,26 +142,65 @@ void* loadXpg(const char * filepath)
 
 	// page info
 	g_rawSpriteNum = 0;
-	g_rawScriptNum = 0;
+	g_rawCommandNum = 0;
 	for (i = 0; i < g_rawPageNum; i ++ )
 	{
 		u32_t spriteNum = getU32(xpgdata, pageHeadOffset + 32 * i + 8);
-		u32_t scriptNum = getU32(xpgdata, pageHeadOffset + 32 * i + 16);
+		u32_t cmdNum = getU32(xpgdata, pageHeadOffset + 32 * i + 16);
 		g_rawSpriteNum += spriteNum;
-		g_rawScriptNum += scriptNum;
+		g_rawCommandNum += cmdNum;
 	}
 
 	g_rawSprites = (RawSpriteInfo*) malloc((g_rawSpriteNum + 1) * sizeof(RawSpriteInfo));
 	memset(g_rawSprites, 0, (g_rawSpriteNum + 1) * sizeof(RawSpriteInfo));
 
-	g_rawScripts = (RawScriptInfo*) malloc((g_rawScriptNum + 1) * sizeof(RawScriptInfo));
-	memset(g_rawScripts, 0, (g_rawScriptNum + 1) * sizeof(RawScriptInfo));
+	g_rawCommands = (RawCommandInfo*) malloc((g_rawCommandNum + 1) * sizeof(RawCommandInfo));
+	memset(g_rawCommands, 0, (g_rawCommandNum + 1) * sizeof(RawCommandInfo));
 
 	g_rawPages = (RawPageInfo*) malloc((g_rawPageNum + 1) * sizeof(RawPageInfo));
 	memset(g_rawPages, 0, (g_rawPageNum + 1) * sizeof(RawPageInfo));
 
-	printf("pageTotal = %d, role total = %d, sprite total = %d, script total = %d\n", g_rawPageNum, g_rawRoleNum, g_rawSpriteNum, g_rawScriptNum);
+	printf("pageTotal = %d, role total = %d, sprite total = %d, command total = %d\n", g_rawPageNum, g_rawRoleNum, g_rawSpriteNum, g_rawCommandNum);
 
+	// read page
+	u32_t spriteCounter = 0;
+	u32_t commandCounter = 0;
+	for (i = 0; i < g_rawPageNum; i ++ )
+	{
+		RawPageInfo * pstPage = & g_rawPages[i];
+		pstPage->pageIndex = getU32(xpgdata, pageHeadOffset + 32 * i + 0);
+		u32_t offsetSprites = getU32(xpgdata, pageHeadOffset + 32 * i + 4);
+		pstPage->numSprites = getU32(xpgdata, pageHeadOffset + 32 * i + 8);
+		u32_t offsetCmd = getU32(xpgdata, pageHeadOffset + 32 * i + 12);
+		pstPage->numCmd = getU32(xpgdata, pageHeadOffset + 32 * i + 16);
+		pstPage->hashKey = getU32(xpgdata, pageHeadOffset + 32 * i + 20);
+		pstPage->spriteBegin = spriteCounter;
+		pstPage->commandBegin = commandCounter;
+
+		for (j = 0; j < pstPage->numSprites; j++)
+		{
+			RawSpriteInfo * pstSprite = & g_rawSprites[spriteCounter];
+			pstSprite->index = getU32(xpgdata, offsetSprites + 52 * j + 0);
+			pstSprite->x = getU32(xpgdata, offsetSprites + 52 * j + 4);
+			pstSprite->y = getU32(xpgdata, offsetSprites + 52 * j + 8);
+			pstSprite->roleId = getU32(xpgdata, offsetSprites + 52 * j + 12);
+			pstSprite->typeFlag = getU32(xpgdata, offsetSprites + 52 * j + 16);
+			pstSprite->touchEnable = getU32(xpgdata, offsetSprites + 52 * j + 20);
+			pstSprite->touchFlag = getU32(xpgdata, offsetSprites + 52 * j + 24);
+			pstSprite->flag = getU32(xpgdata, offsetSprites + 52 * j + 28);
+			spriteCounter++;
+		}
+
+		for (k = 0; k < pstPage->numCmd; k++)
+		{
+			RawCommandInfo * pstCommand = & g_rawCommands[commandCounter];
+    		pstCommand->eventKey = getU16(xpgdata, offsetCmd + 4 + 8 * k + 0);
+    		pstCommand->pageKey = getU16(xpgdata, offsetCmd + 4 + 8 * k + 2);
+    		pstCommand->actionKey = getU16(xpgdata, offsetCmd + 4 + 8 * k + 4);
+			commandCounter++;
+			//printf("event=%d, page=%d, action=%d\n", pstCommand->eventKey, pstCommand->pageKey, pstCommand->actionKey);
+		}
+	}
 
 	//xpg->fileHandle = xpghandle; 
 	free(xpgdata);
@@ -237,5 +277,10 @@ static u32_t o2u(const u8_t * str)
 static u32_t getU32(const u8_t * b, u32_t index)
 {
 	return (b[index + 3] << 24) | (b[index + 2] << 16) | (b[index + 1] << 8) | b[index];
+}
+
+static u16_t getU16(const u8_t * b, u32_t index)
+{
+	return (b[index + 1] << 8) | b[index];
 }
 

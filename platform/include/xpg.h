@@ -20,15 +20,29 @@ typedef struct {
 }RawRoleInfo;
 
 typedef struct {
-    int a;
+    u32_t index;
+    u32_t x;
+    u32_t y;
+    u32_t roleId;
+    u32_t typeFlag;
+    u32_t flag;
+    u32_t touchEnable;
+    u32_t touchFlag;
 }RawSpriteInfo;
 
 typedef struct {
-    int a;
-}RawScriptInfo;
+    u32_t eventKey;
+    u32_t pageKey;
+    u32_t actionKey;
+}RawCommandInfo;
 
 typedef struct {
-    int a;
+    u32_t pageIndex;
+	u32_t numSprites;
+	u32_t numCmd;
+	u32_t hashKey;
+	u32_t spriteBegin;
+	u32_t commandBegin;
 }RawPageInfo;
 
 XPGHandle loadXpg(const char * filepath);
@@ -36,11 +50,11 @@ int closeXpg(void * handle);
 
 extern RawRoleInfo   * g_rawRoles;
 extern RawSpriteInfo * g_rawSprites;
-extern RawScriptInfo * g_rawScripts;
+extern RawCommandInfo* g_rawCommands;
 extern RawPageInfo   * g_rawPages;
 extern u32_t           g_rawRoleNum;
 extern u32_t           g_rawSpriteNum;
-extern u32_t           g_rawScriptNum;
+extern u32_t           g_rawCommandNum;
 extern u32_t           g_rawPageNum;
 
 #ifdef __cplusplus
