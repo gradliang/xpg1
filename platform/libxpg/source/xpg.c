@@ -6,10 +6,12 @@
 typedef struct {
 	u32_t		offset;
 	u32_t		size;
-}RoleOffsetSizeInfo;
+}RoleOffSizeInfo;
 
 typedef struct {
-	FILE *		fileHandle;
+	FILE *				fileHandle;
+	RoleOffSizeInfo*	rolesInfo;
+	u32_t				roleNum;
 }XpgFileInfo;
 
 typedef struct {
@@ -26,12 +28,14 @@ u32_t           g_rawSpriteNum = 0;
 u32_t           g_rawCommandNum = 0;
 u32_t           g_rawPageNum = 0;
 
+static XpgFileInfo  xpgFileInfo;
+
 static int getHeadDataInfo(u8_t * data, CommonFileInfo * pFileInfo);
 static u32_t o2u(const u8_t * str);
 static u32_t getU32(const u8_t * buffer, u32_t index);
 static u16_t getU16(const u8_t * buffer, u32_t index);
 
-void* loadXpg(const char * filepath)
+int loadXpg(const char * filepath)
 {
 	int errcode = 0;
 	XpgFileInfo * xpg;
@@ -42,35 +46,34 @@ void* loadXpg(const char * filepath)
 	size_t  rdsize, filecount;
 	u32_t skipsize;
 	u32_t i, j, k;
-	u8_t *	xpgdata;					// xpg head file data
+	u8_t *	xpgdata = NULL;				// xpg head file data
 	u32_t	xpgsize;					// xpg head file size
 	
 	if (filepath == NULL || filepath[0] == 0) {
 		printf("-E- %s() param is NULL. \n", __FUNCTION__);
-		return NULL;
+		return -1;
 	}
-	xpg = (XpgFileInfo*) malloc(sizeof(XpgFileInfo));
-	if (xpg == NULL)
-	{
-		printf("-E- memory alloc fail in %s (%d) \n", __FILE__, __LINE__);
-		return NULL;
-	}
+	xpg = &xpgFileInfo;
 	memset(xpg, 0, sizeof(xpg));
 
 	xpghandle = fopen(filepath, "rb");
 	if (xpghandle == NULL) {
 		printf("-E- xpg file open error \n");
-		free(xpg);
-		return NULL;
+		return -1;
 	}
 
 	fread(flag, 1, 8, xpghandle);
 	if (0 != strncmp(flag, "index.xpg", 8)) {
 		printf("-E- xpg file format error, flag error \n");
 		fclose(xpghandle);
-		free(xpg);
-		return NULL;
+		return -1;
 	}
+
+	fseek(xpghandle, 0x020c, SEEK_SET);
+	fread(&xpg->roleNum, 1, 4, xpghandle);
+	xpg->rolesInfo = (RoleOffSizeInfo*) malloc((xpg->roleNum + 1) * sizeof(RoleOffSizeInfo));
+	memset(xpg->rolesInfo, 0, (xpg->roleNum + 1) * sizeof(RoleOffSizeInfo));
+	//printf("roleNum = %d\n", xpg->roleNum);
 
 	fseek(xpghandle, 0, SEEK_SET);
 
@@ -84,6 +87,10 @@ void* loadXpg(const char * filepath)
 			printf("-E- xpg file format error, file break \n");
 			errcode = -1;
 			break;
+		}
+
+		if (filecount != 0) {
+			xpg->rolesInfo[filecount - 1].offset = ftell(xpghandle);
 		}
 		
 		errcode = getHeadDataInfo(headdata, &fileinfo);
@@ -104,11 +111,22 @@ void* loadXpg(const char * filepath)
 			fseek(xpghandle, skipsize, SEEK_CUR);
 		}
 
+		if (filecount != 0)
+			xpg->rolesInfo[filecount - 1].size = fileinfo.filesize;
+
 		filecount ++;
 		//printf("file=%s, size=%d \n", fileinfo.fileName, fileinfo.filesize);
 	}
+
+	//for (i = 0; i < xpg->roleNum; i++) {
+	//	printf("%03d. offset = 0x%08x, size = %d\n", i, xpg->rolesInfo[i].offset, xpg->rolesInfo[i].size);
+	//}
 	
 	fclose(xpghandle);
+
+	if (errcode) {
+		goto XpgHeadDataFormatFail;
+	}
 	
 	// parse xpg head
 	char XPG6[4];
@@ -160,7 +178,7 @@ void* loadXpg(const char * filepath)
 	g_rawPages = (RawPageInfo*) malloc((g_rawPageNum + 1) * sizeof(RawPageInfo));
 	memset(g_rawPages, 0, (g_rawPageNum + 1) * sizeof(RawPageInfo));
 
-	printf("pageTotal = %d, role total = %d, sprite total = %d, command total = %d\n", g_rawPageNum, g_rawRoleNum, g_rawSpriteNum, g_rawCommandNum);
+	//printf("pageTotal = %d, role total = %d, sprite total = %d, command total = %d\n", g_rawPageNum, g_rawRoleNum, g_rawSpriteNum, g_rawCommandNum);
 
 	// read page
 	u32_t spriteCounter = 0;
@@ -202,30 +220,59 @@ void* loadXpg(const char * filepath)
 		}
 	}
 
-	//xpg->fileHandle = xpghandle; 
-	free(xpgdata);
-
-	return xpg;
+	xpg->fileHandle = fopen(filepath, "rb");
+	printf("xpg load OK. \n");
+	errcode = 0;
+	goto End;
 
 XpgHeadDataFormatFail:
-	return NULL;
+	errcode = -1;
+	printf("-E- xpg load fail. \n");
+End:
+	if (xpgdata) {
+		free(xpgdata);
+		xpgdata = NULL;
+	}
+	return errcode;
 }
 
-int closeXpg(void * handle)
+int closeXpg()
 {
-	XpgFileInfo * xpg;
-
-	if (handle == NULL)
-		return FAIL;
-	xpg = (XpgFileInfo*) handle;
+	XpgFileInfo * xpg = &xpgFileInfo;
 
 	if (xpg->fileHandle != NULL) {
 		fclose(xpg->fileHandle);
 		xpg->fileHandle = NULL;
 	}
-
-	free(xpg);
+	if (xpg->rolesInfo != NULL) {
+		free(xpg->rolesInfo);
+		xpg->rolesInfo = NULL;
+		xpg->roleNum = 0;
+	}
 	return PASS;
+}
+
+u32_t getXpgImageSize(u32_t roleIndex)
+{
+	XpgFileInfo * xpg = &xpgFileInfo;
+	if (roleIndex >= xpg->roleNum)
+		return 0;
+	return xpg->rolesInfo[roleIndex].size;
+}
+
+u32_t getXpgReadImage(u32_t roleIndex, u8_t * buffer)
+{
+	u32_t n;
+	XpgFileInfo * xpg = &xpgFileInfo;
+	if (roleIndex >= xpg->roleNum)
+		return 0;
+	if (xpg->fileHandle == NULL)
+		return 0;
+	if (buffer == NULL)
+		return 0;
+	fseek(xpg->fileHandle, xpg->rolesInfo[roleIndex].offset, SEEK_SET);
+	n = fread(buffer, 1, xpg->rolesInfo[roleIndex].size, xpg->fileHandle);
+	return n;
 }
 
 static int getHeadDataInfo(u8_t * data, CommonFileInfo * pFileInfo) 

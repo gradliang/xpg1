@@ -12,7 +12,6 @@ extern "C" {
 typedef unsigned char   u8_t;
 typedef unsigned short  u16_t;
 typedef unsigned int    u32_t;
-typedef void *          XPGHandle;
 
 typedef struct {
     u32_t       width;
@@ -45,8 +44,10 @@ typedef struct {
 	u32_t commandBegin;
 }RawPageInfo;
 
-XPGHandle loadXpg(const char * filepath);
-int closeXpg(void * handle);
+int loadXpg(const char * filepath);
+int closeXpg();
+u32_t getXpgImageSize(u32_t roleIndex);
+u32_t getXpgReadImage(u32_t roleIndex, u8_t * buffer);
 
 extern RawRoleInfo   * g_rawRoles;
 extern RawSpriteInfo * g_rawSprites;

@@ -3,8 +3,8 @@
 
 int main(int argc, char ** argv)
 {
-    XPGHandle handle = loadXpg("1.xpg");
-    closeXpg(handle);
+    loadXpg("1.xpg");
+    closeXpg();
     return 0;
 }
 
