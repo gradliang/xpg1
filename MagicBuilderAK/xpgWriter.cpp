@@ -409,7 +409,7 @@ bool XpgMovies::m_SaveFile( const char *filename, int quality )
             // Write Script Data
             int iCommandCount = pPage->GetCommandCount();
 
-            pPage->m_lScriptFilePos = 0;
+            pPage->m_lScriptFilePos = ftell(fp);
             if (iCommandCount > 0)
             {
                 pPage->m_lScriptFilePos = ftell(fp);
@@ -1037,7 +1037,7 @@ bool XpgMovies::m_WriteNewFormatXPGFile(const char *filename)
         // Write Script Data
         myPageSpritesInfo.uScript_offset = ftell(xpg);
         int iCommandCount = pPage->GetCommandCount();
-        pPage->m_lScriptFilePos = 0;
+        //pPage->m_lScriptFilePos = 0;
         pPage->m_lScriptFilePos = ftell(xpg);
         if (iCommandCount > 0)
         {
