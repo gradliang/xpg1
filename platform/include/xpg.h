@@ -49,14 +49,14 @@ int closeXpg();
 u32_t getXpgImageSize(u32_t roleIndex);
 u32_t getXpgReadImage(u32_t roleIndex, u8_t * buffer);
 
-extern RawRoleInfo   * g_rawRoles;
-extern RawSpriteInfo * g_rawSprites;
-extern RawCommandInfo* g_rawCommands;
-extern RawPageInfo   * g_rawPages;
-extern u32_t           g_rawRoleNum;
-extern u32_t           g_rawSpriteNum;
-extern u32_t           g_rawCommandNum;
-extern u32_t           g_rawPageNum;
+RawRoleInfo * getRawRoleList();
+RawSpriteInfo * getRawSpriteList();
+RawCommandInfo * getRawCmdList();
+RawPageInfo * getRawPageList();
+u32_t  getRawRoleTotal();
+u32_t  getRawSpriteTotal();
+u32_t  getRawCmdTotal();
+u32_t  getRawPageTotal();
 
 #ifdef __cplusplus
 } // extern "C" 

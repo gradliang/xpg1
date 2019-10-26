@@ -35,6 +35,45 @@ static u32_t o2u(const u8_t * str);
 static u32_t getU32(const u8_t * buffer, u32_t index);
 static u16_t getU16(const u8_t * buffer, u32_t index);
 
+RawRoleInfo * getRawRoleList()
+{
+	return g_rawRoles;
+}
+
+RawSpriteInfo * getRawSpriteList()
+{
+	return g_rawSprites;
+}
+
+RawCommandInfo * getRawCmdList()
+{
+	return g_rawCommands;
+}
+
+RawPageInfo * getRawPageList()
+{
+	return g_rawPages;
+}
+
+u32_t  getRawRoleTotal()
+{
+	return g_rawRoleNum;
+}
+u32_t  getRawSpriteTotal()
+{
+	return g_rawSpriteNum;
+}
+
+u32_t  getRawCmdTotal()
+{
+	return g_rawCommandNum;
+}
+
+u32_t  getRawPageTotal()
+{
+	return g_rawPageNum;
+}
+
 int loadXpg(const char * filepath)
 {
 	int errcode = 0;
